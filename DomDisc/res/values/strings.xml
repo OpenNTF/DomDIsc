@@ -1,0 +1,57 @@
+<resources>
+
+    <!-- needs sorting -->
+    <string name="menu_refresh">Reload list</string>
+    <string name="loading">loading</string>
+    <string name="menu_compose_document">Compose document</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_discard">Discard</string>
+    <string name="menu_empty_log">Empty log list</string>
+
+    <!-- General app -->
+    <string name="app_name">DomDisc</string>
+
+    <!-- StartActivity -->
+    <string name="menu_configuration">Configuration</string>
+    <string name="menu_about">About app</string>
+    <string name="menu_log">Log</string>
+
+    <!-- DatabaseConfigurationsActivity -->
+    <string name="menu_settings">Preferences</string>
+    <string name="title_activity_main">Database configurations</string>
+    <string name="menu_add_database">Add database</string>
+
+    <!-- Background code -->
+    <string name="alarms_scheduled">Alarms scheduled!</string>
+
+    <!-- LogListActivity -->
+
+
+    <!-- ReadDiscussionEntryFragment -->
+    <string name="toggle_body_responses_button_responses_visible">show text</string>
+    <string name="toggle_body_responses_button_body_visible">show %1 responses</string>
+
+    <!-- PreferenceActivity -->
+    <string name="preference_category_logging">Logging</string>
+    <string name="title_checkbox_preference_logalot">Log extra</string>
+    <string name="summary_checkbox_preference_logalot">For debugging</string>
+    <string name="preference_category_replication">Replication</string>
+    <string name="title_list_preference_logschedule">Replication schedule</string>
+    <string name="summary_list_preference_logschedule">How often to sync</string>
+    <string name="dialog_title_logschedule_preference">Select schedule</string>
+
+    <!-- AddDiscussionEntryActivity -->
+    <string name="subject">Subject:</string>
+    <string name="subject_hint">Short subject of your entry</string>
+    
+    <string name="categories">Categories:</string>
+    <string name="category_hint">A category</string>
+    
+    <string name="body">Body:</string>
+    <string name="body_hint">Enter the main body text</string>
+    
+
+    <!-- InitialRightPaneFragment -->
+    <string name="initial_right_pane_text">Welcome to the app</string>
+
+</resources>

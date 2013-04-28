@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="entries_logschedule_preference">
+        <item>5 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>2 hour</item>  
+        <item>6 hour</item>
+        <item>12 hour</item>
+        <item>24 hour</item>
+    </string-array>
+
+    <string-array name="entryvalues_logschedule_preference">
+        <item>5</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>  
+        <item>360</item>
+        <item>720</item>
+        <item>1440</item>  
+    </string-array>
+    
+</resources>

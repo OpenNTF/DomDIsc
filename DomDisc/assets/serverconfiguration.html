@@ -1,0 +1,38 @@
+<html>
+<body>
+<h1>Server configuration</h1>
+For the app to work, there are a number of things that have to be in place on the IBM Domino server that the app will access.<br>
+The Domino Data Service api is used to replicate with IBM Domino.<br> 
+This requires the server to be either release 9+ or it can be release 8.5.3+ with the Extension Library or Upgrade Pack.<br> 
+It also requires the server and discussion database to be configured to allow the use of the Domino Data Service api.<br>
+
+<h2>Getting the IBM Domino server ready for Domino Data Service</h2>
+If the server is Release 9+, proceed to Server configuration. The features needed for Domino Data Service are installed automatically when installing R9.<br> 
+If the server is Release 8.5.3 or newer, you need to make sure that either the Extension Library or the Upgrade Pack 1 (or newer) is installed.<br>
+If the server is a release before 8.5.3, you will not be able to enable the Domino Data Service, and the app will not work with the server.<br>
+<br>
+The Upgrade Pack is basically the <a href="http://extlib.openntf.org/">Extension Library</a> repackaged in order to be IBM supported. instructions for installing 
+the Extension Library apply also for installing the Upgrade Pack. Instructions can be found on the documention wiki: <a href="http://www-10.lotus.com/ldd/ddwiki.nsf/xpDocViewer.xsp?lookupName=Domino+Designer+XPages+Extension+Library#action=openDocument&res_title=Installing_and_administering_the_XPages_Extension_Library_ddxl853&content=pdcontent">
+Installing and administering the XPages Extension Library</a>. 
+
+<h3>Server configuration</h3>
+On the Internet Site document for the host name that the app will access, you need to set this value:<br>
+<img src="internet_site_domino_data_service.gif"><br>
+
+<h3>Database configuration</h3>
+The database has to be enabled for Domino Data Service. You find the property set here:<br>
+<img src="database_property_domino_data_service.gif"><br>
+Be aware that this property gets overwritten if the database inherits its design from a template that does not have the same property. 
+So either you have to set the property in the template or you have to make sure that the database does not inherit its design from the template. 
+
+
+<h1>Server SSL certificate</h1>
+The app can use SSL to replicate with the server. Replication is not actually Notes/Domino replication. It is HTTP or HTTPS communication.<br>
+The SSL certificate used on the server needs to be be issued from one of the major root certificate organisations. 
+A list of these is available in <a href="http://www.andreabaccega.com/blog/2010/09/23/android-root-certification-authorities-list/">Android Root Certification Authorities List</a>.
+ 
+<h1>Other information</h1>
+<a href="aboutapp.html">About the app</a> | <a href="serverconfiguration.html">Server configuration</a> | <a href="developer.html">Developer information</a>
+ 
+</body>
+</html>

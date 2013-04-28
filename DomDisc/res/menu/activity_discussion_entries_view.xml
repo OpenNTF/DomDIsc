@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item android:id="@+id/menu_compose_document"
+		android:showAsAction="ifRoom" android:title="@string/menu_compose_document"
+		android:titleCondensed="@string/menu_compose_document" android:icon="@drawable/content_new" />
+
+	<item android:id="@+id/menu_refresh" android:title="@string/menu_refresh"
+		android:orderInCategory="100" android:showAsAction="ifRoom"
+		android:icon="@drawable/navigation_refresh" />
+	<item android:id="@+id/menu_settings" android:title="@string/menu_configuration"
+		android:orderInCategory="100" android:showAsAction="never" />
+	<item android:id="@+id/menu_about" android:showAsAction="never"
+		android:title="@string/menu_about" android:titleCondensed="@string/menu_about" />
+
+	<item android:id="@+id/menu_log" android:showAsAction="never"
+		android:title="@string/menu_log" android:titleCondensed="@string/menu_log" />
+
+</menu>

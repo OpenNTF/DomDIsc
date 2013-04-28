@@ -1,0 +1,129 @@
+<html>
+<body>
+<h1>About the app</h1>
+This app - lets you take an IBM Domino discussion database with you on your Android device.<br> 
+The content is stored locally on the device, letting you read and participate in the discussion even if there is no network connection. When you do have a network connection, the database replicates new entries from the server to the app, and any entries written by you on the device get replicated to the Domino server.
+Replication happens in the background on a schedule configured by you.<br>
+You can configure the app to replicate with multiple discussion databases.<br>
+
+<h1>Getting the app to work</h1>
+
+<h2>Server and administration</h2>
+The Domino Data Service api is used to replicate with IBM Domino. This requires the IBM Domino server to be either release 9+ or it can be release 8.5.3+ with the Extension Library or Upgrade Pack. It also requires the server and discussion database to be configured to allow the use of the Domino Data Service api.<br>
+You need to talk to your Domino administrator to make the Domino Data Service available. 
+Further information can be found in <a href="serverconfiguration.html">Server configuration</a>.  
+
+<h2>App configuration</h2>
+When the app launches, you have a Configuration menu item. Click it to configure.<br>
+
+When you get to the Database configurations view, you can click + action button to add a database that you would like to make available in the app.<br>
+You can also click the Settings action button to configure replication intervals and if you want to enable extra logging. Replicating often will 
+drain your battery. <br>
+
+<h3>Configuring a new discussion database</h3>
+Be aware that there is very little quality checking in the form that you fill out when configuring replication with database.
+A very common issue is that your device keyboard might insert a space character in places where they were not meant to be. For instance many keyboards insert a space character when you put a punctuation mark in a text field.
+
+<h4>Discussion database name</h4>
+This is what you would like to call the database when displayed in the app.
+
+<h4>Host name</h4>
+The Internet DNS name of the server on which the database is located. Could be something like mail.acme.com or www.databases.acme.com.
+
+<h4>Path to database</h4>
+This is the path to the database when it is located on the server. Values could be for instance /discussions/salesdisc.nsf or /sales/news.nsf.
+
+<h4>Username for login</h4>
+This is your Notes name. The name you see when creating emails in Notes for instance. Common values look like this: Jens Bruntt/Sales/Acme or Jack Johnson/Acme.
+
+<h4>Password</h4>
+This is your http password. This is not always the same value as when you use your Notes client. If you use iNotes, Traveler or web applications located on IBM Domino, 
+then the password you should configure is the one you use in those applications.  
+
+<h4>Use SSL</h4>
+Check to enable SSL. Encrypts data sent to and retrievede from the server. Highly advisable to use.<br>
+
+<h4>HTTP Port</h4>
+This is the port used to communicate with the server. It is a number. Usually 80 (for non-ssl) or 443 (for ssl). If you check the use ssl option, you most likely should put 443 here. 
+
+<h1>Log</h1>
+There is a log available in the app from the action bar. How much is written to the log depends on your configuration.<br>
+Note that you can delete the log contents, using the delete action bar button.<br> 
+
+<h1>Limitations</h1>
+<ul>
+<li>Only Domino Discussion Databases made with the standard template (StdR9Discussion) have been tested with the app. Other disucssion database designs may work.</li>
+<li>Images are not displayed.</li>
+</ul>
+
+<h1>Security</h1>
+When you configure the app, please go for SSL (also known as HTTPS). Otherwise your username and password will get transmitted over the Internet in a form that is easy to get access to.<br>
+Be aware that your username and password do get stored in the app. If you lose the device, the password is not easily accessible, but someone with the right tools will be able to find and copy it.<br>
+Make sure that you use a Screen lock and a good device retrieval app that can help you wipe apps and data if you lose it.<br>
+You should <strong>consult with the server administrator</strong> in your organisation before using this app, to make sure that it meets IT-guidelines.   
+
+
+<h1>Background information</h1>
+The app is developed using the Android SDK. It is a completely native app, using just Java.<br>
+
+<h2>Open source</h2>
+The app source code is Apache License 2.0. This means you can find the source code, modify it, compile your own if you like.<br>
+The app is released on <a href="http://www.openntf.org/internal/home.nsf/project.xsp?action=openDocument&name=DomDisc%20for%20Android">openntf.org</a>. <br>
+You are invited to comment, ask for improvements, or even join the development of the app. Go to the openntf.org project page and get involved.<br> 
+
+<h2>Developer</h2>
+<table>
+<tr>
+<td><img src="jbr_profil_72x90_color.png"></td>
+<td>The developer of this App is Jens Bruntt.<br> 
+You can find him blogging on <a href="http://www.jens.bruntt.dk">www.jens.bruntt.dk</a>.</td>
+</tr>
+</table>
+
+
+<h1>Thank you</h1>
+<h2>The App launcher icon</h2>
+<table>
+<tr>
+<td><img src="domdisclaunchericon.png"></td>
+<td>
+The icon is based on the work of Nathan Freeman <br>
+URL: <a href="http://www.flickr.com/photos/caveatemptor27/1225761630/in/photostream">http://www.flickr.com/photos/caveatemptor27/1225761630/in/photostream</a><br>
+License: Creative commons Attribution license (http://creativecommons.org/licenses/by/2.0/deed.en)<br></td>
+</tr>
+</table>
+
+<h2>UI design</h2>
+Thank you to Frederikke Bruntt (daughter of the developer) for suggestions on improving the User interface. 
+
+<h2>Open Source projects</h2>
+The following is a list of Open Source libraries and code samples that are used in the app<br>
+<br>
+Code: The Android Open Source Project SDK.<br> 
+URL: http://developer.android.com/sdk/index.html<br>
+<br>
+Code: ActionBarSherlock<br>
+URL: http://actionbarsherlock.com/<br>
+<br> 
+Code: ORMLite core and ORMLite android<br>
+URL: http://ormlite.com/<br>
+<br>
+Code: SPRING FOR ANDROID<br>
+URL: http://www.springsource.org/spring-android<br>
+<br>
+Code: WakefulIntentService<br>
+URL: https://github.com/commonsguy/cwac-wakeful/<br>
+<br>
+Code: Jackson core, databind, annotations<br>
+URL: http://wiki.fasterxml.com/JacksonDownload<br>
+<br>
+Code: Apache Commons Codec<br>
+URL: http://commons.apache.org/proper/commons-codec/<br>
+= = =
+
+<h1>Other information</h1>
+<a href="aboutapp.html">About the app</a> | <a href="serverconfiguration.html">Server configuration</a> | <a href="developer.html">Developer information</a>
+
+ 
+</body>
+</html>

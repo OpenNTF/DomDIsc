@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.openntf.domdisc"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="14" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@drawable/domdisclaunchericon"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Sherlock.Light" >
+        <activity
+            android:name="org.openntf.domdisc.ui.DatabaseConfigurationsActivity"
+            android:label="@string/title_activity_main" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DiscussionEntriesViewActivity" />
+        </activity>
+        <activity
+            android:name="org.openntf.domdisc.ui.AddDiscussionDatabaseActivity"
+            android:label="Add discussion database" />
+        <activity
+            android:name="org.openntf.domdisc.ui.AddDiscussionEntryActivity"
+            android:label="Add discussion entry" />
+        <activity
+            android:name="org.openntf.domdisc.ui.LogListActivity"
+            android:label="Log Entries" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DiscussionEntriesViewActivity" />
+        </activity>
+        <activity
+            android:name="org.openntf.domdisc.ui.PreferenceActivity"
+            android:label="Preferences" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DatabaseConfigurationsActivity" />
+        </activity>
+        <activity
+            android:name="org.openntf.domdisc.ui.ReadDiscussionEntry2Activity"
+            android:label="Read entry" >
+        </activity>
+        <activity
+            android:name="org.openntf.domdisc.ui.AboutAppActivity"
+            android:label="About app" >
+        </activity>
+        <activity
+            android:name="org.openntf.domdisc.ui.StartActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name="org.openntf.domdisc.general.PollReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="org.openntf.domdisc.general.ScheduledService" >
+        </service>
+    </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+</manifest>

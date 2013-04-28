@@ -1,0 +1,96 @@
+
+Copyright 2013 Jens Bruntt - jens@bruntt.dk
+
+This product includes software developed for
+OpenNTF – (http://www.OpenNTF.org/)
+Licensed under Apache License Version 2.0
+
+= = =
+
+Included Open Source third party code libraries
+
+= = =
+
+Code: The Android Open Source Project SDK. 
+version: 21.1
+URL: http://developer.android.com/sdk/index.html
+License: Licensed under Apache License Version 2.0 according to the NOTICE.txt file indluded in the sdk/tools folder of the SDK 
+installation directory and according to this http://source.android.com/source/licenses.html
+
+= 
+
+Code: ActionBarSherlock
+Version: 4.2.0
+URL: http://actionbarsherlock.com/ 
+License: Apache License Version 2.0 According to https://github.com/JakeWharton/ActionBarSherlock#readme
+
+=
+
+Code: ORMLite core and ORMLite android
+version: 4.43
+URL: http://ormlite.com/
+License: License type not named. Details: http://ormlite.com/javadoc/ormlite-core/doc-files/ormlite_9.html#License
+
+=
+
+Code: SPRING FOR ANDROID
+version: 1.0.1
+URL: http://www.springsource.org/spring-android
+License: Apache License Version 2.0 as it is part of the  Spring Framework - http://www.springsource.org/spring-framework
+
+=
+
+Code: WakefulIntentService
+Version: 0.6.0
+URL: https://github.com/commonsguy/cwac-wakeful/
+License: Apache License Version 2.0  according to https://github.com/commonsguy/cwac-wakeful/
+
+= 
+
+Code: Jackson core, databind, annotations
+Version 2.1.4
+URL: http://wiki.fasterxml.com/JacksonDownload
+License: Apache License Version 2.0 chosen from the options in http://wiki.fasterxml.com/JacksonLicensing
+
+= 
+
+Code: Apache Commons Codec
+Version: 1.7
+URL: http://commons.apache.org/proper/commons-codec/
+License: Apache License Version 2.0 linked to from http://commons.apache.org/proper/commons-codec/
+
+= = =
+
+Open Source third party code that has been re-used in the main Code 
+
+= = =
+
+Code from Commonsware in domdisc/general/PollReceiver.java and ScheduledService.java 
+Code is based on the project here https://github.com/commonsguy/cwac-wakeful/
+License:  Apache License Version 2.0 according to the LICENSE file in the project.
+
+=
+
+Code from The Android Open Source Project  in res/xml/preferences.xml 
+URL: http://source.android.com/
+License: Apache License Version 2.0 according to contents of the file.
+ 
+ =
+ 
+Code from Jack Wharton in ui/PreferenceActivity.java and most of the other java files in the ui-package.
+Code is based on the samples in the project.
+URL: https://github.com/JakeWharton/ActionBarSherlock
+License is Apache License Version 2.0 according to contents of the LICENSE.txt in the project.
+
+= = = 
+
+Other resources used in the app
+
+= = =
+
+The App launcher icon is based on the work of Nathan Freeman 
+URL: http://www.flickr.com/photos/caveatemptor27/1225761630/in/photostream
+License: Creative commons Attribition license (http://creativecommons.org/licenses/by/2.0/deed.en) 
+
+
+ 

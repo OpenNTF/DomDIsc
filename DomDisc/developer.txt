@@ -1,0 +1,49 @@
+Developer information
+
+= = = 
+
+Getting started - how to get this project to compile
+
+= = = 
+
+Install the Android SDK. See the NOTICE file for download location.
+Import the project as an Android project.
+
+Download the ActionBar Sherlock kit. See the NOTICE file for download location.
+See this http://www.slideshare.net/androidstream/action-bar-sherlock-tutorial - take not of the third slide
+You need to call the library ABS, as the DomDisc project references the library as ABS.
+If you have pulled the DomDisc code from GIThub using a GIT client, you should make sure that the ABS
+library is also stored in Eclipse as a GIT project. You do not need to submit ABS to GitHub, you
+just need to make sure that it is stored next to DomDisc.
+If you get problems with the reference to ABS, you need to look in the Properties for the DomDisc
+project (Right click on the Project name->Properties->Android). Here, at the bottom you will see 
+the reference to the ABS library.
+
+= = = 
+
+Information Resources
+
+= = = 
+
+* Accessing Domino Data Service
+An essential resource for understanding how to communicate with the Domino Data Service JSON API.
+http://www-10.lotus.com/ldd/ddwiki.nsf/xpDocViewer.xsp?lookupName=Domino+Data+Service#action=openDocument&res_title=Accessing_Domino_Data_Service_dds10&content=pdcontent
+http://www-10.lotus.com/ldd/ddwiki.nsf/xpDocViewer.xsp?lookupName=Domino+Data+Service#action=openDocument&res_title=Specifying_a_request_URL_dds10&content=pdcontent 
+http://www-10.lotus.com/ldd/ddwiki.nsf/xpDocViewer.xsp?lookupName=Domino+Data+Service#action=openDocument&res_title=Receiving_response_headers_dds10&content=pdcontent
+ http://www.openntf.org/Projects/pmt.nsf/36B7CD129ED7357A86257AC6005523E7/$file/Extension%20Library%20REST%20Services.pdf (page 11)
+  
+* Using Spring REST template
+http://static.springsource.org/spring-android/docs/1.0.x/reference/html/rest-template.html
+
+* Using ActionBar Sherlock
+http://www.slideshare.net/androidstream/action-bar-sherlock-tutorial
+http://stackoverflow.com/questions/11931811/menu-with-action-bar-sherlock
+http://www.youtube.com/watch?feature=player_embedded&v=4GJ6yY1lNNY#!
+http://www.grokkingandroid.com/adding-actionbarsherlock-to-your-project/
+http://www.grokkingandroid.com/actionbarsherlock-up-navigation/
+http://stackoverflow.com/questions/11165700/actionbarsherlock-library-is-full-of-errors-after-being-imported
+
+* Including libraries in Android
+http://stackoverflow.com/questions/9873152/how-to-attach-javadoc-or-sources-to-jars-in-libs-folder
+
+
