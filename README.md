@@ -14,3 +14,10 @@ The Domino Data Service api is used to replicate with IBM Domino. This requires 
 either release 9+ or it can be release 8.5.3+ with the Extension Library or Upgrade Pack. 
 It also requires the server and discussion database to be configured to allow the use of the 
 Domino Data Service api.
+
+The app is Open Source and Apache License 2.0.
+
+You can read more about the app on http://www.openntf.org/Internal/home.nsf/project.xsp?action=openDocument&name=DomDisc%20for%20Android
+
+
+
