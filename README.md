@@ -19,5 +19,8 @@ The app is Open Source and Apache License 2.0.
 
 You can read more about the app on http://www.openntf.org/Internal/home.nsf/project.xsp?action=openDocument&name=DomDisc%20for%20Android
 
-
-
+OPENNTF 
+    This project is an OpenNTF project, and is available under the Apache License V2.0.   
+    All other aspects of the project, including contributions, defect reports, discussions, 
+    feature requests and reviews are subject to the OpenNTF Terms of Use - available at 
+    http://openntf.org/Internal/home.nsf/dx/Terms_of_Use. 
