@@ -32,6 +32,7 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 	private OnItemSelectedListener listener;
 	ListView listView;
 	private DiscussionDatabase currentDiscussionDatabase = null;
+	private String currentSearchQuery = "";
 	private boolean shouldCommitToLog = false;
 
 
@@ -63,6 +64,13 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 	
 	public void setDiscussionDatabase(DiscussionDatabase discussionDatabase) {
 		currentDiscussionDatabase = discussionDatabase;
+		currentSearchQuery = "";
+		populateListView();
+	}
+	
+	public void setDiscussionDatabase(DiscussionDatabase discussionDatabase, String searchString) {
+		currentDiscussionDatabase = discussionDatabase;
+		currentSearchQuery = searchString;
 		populateListView();
 		
 	}
@@ -70,9 +78,26 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 	private void populateListView() {
 		if (null != currentDiscussionDatabase) {
 //			final List<DiscussionEntry> discussionEntries = currentDiscussionDatabase.getDiscussionEntries();
-			ApplicationLog.d(getClass().getSimpleName() + "populateListView", shouldCommitToLog);
+			ApplicationLog.d(getClass().getSimpleName() + " populateListView", shouldCommitToLog);
 			
-			final List<DiscussionEntry> discussionEntries = currentDiscussionDatabase.getMainEntries();
+			List<DiscussionEntry> tempDiscussionEntries = null;
+			
+			if(currentSearchQuery != "") {
+				tempDiscussionEntries = DatabaseManager.getInstance().getMainDiscussionEntriesByQuery(currentDiscussionDatabase, currentSearchQuery);	
+			} else {
+				tempDiscussionEntries = currentDiscussionDatabase.getMainEntries();
+			}
+			ApplicationLog.d(getClass().getSimpleName() + " tempDiscussionEntries.count: " + tempDiscussionEntries.size(), shouldCommitToLog);
+			
+			final List<DiscussionEntry> discussionEntries = tempDiscussionEntries;
+			
+//			List<DiscussionEntry> discussionEntries = currentDiscussionDatabase.getMainEntries();
+			
+			//Removed final
+			
+			
+//			List<DiscussionEntry> discussionEntriesByQuery = DatabaseManager.getInstance().getMainDiscussionEntriesByQuery(currentDiscussionDatabase, currentSearchQuery);
+//XX						
 			List<String> titles = new ArrayList<String>();
 			for (DiscussionEntry discussionEntry : discussionEntries) {
 				titles.add(discussionEntry.getSubject());

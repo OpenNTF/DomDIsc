@@ -149,6 +149,34 @@ public class DatabaseManager {
 		}
 		return discussionEntries;
 	}
+	
+	/**
+	 * @param discussionDatabase
+	 * @param query
+	 * @return List of DiscussionEntries that have a subject containing the query string and that are in the discussionDatabase
+	 */
+	public List<DiscussionEntry> getMainDiscussionEntriesByQuery(DiscussionDatabase discussionDatabase, String query) {
+		List<DiscussionEntry> discussionEntries = null;
+
+		try {
+			Dao<DiscussionEntry, String> discussionEntryDao = getHelper().getDiscussionEntryDao();
+			QueryBuilder<DiscussionEntry, String> queryBuilder = discussionEntryDao.queryBuilder();
+			Where<DiscussionEntry, String> where = queryBuilder.where();
+
+			where.like(DiscussionEntry.SUBJECT_FIELD_NAME, "%" + query + "%");
+			where.and();
+			where.eq(DiscussionEntry.DISCUSSIONDB_FIELD_NAME, discussionDatabase);
+			
+			PreparedQuery<DiscussionEntry> preparedQuery = queryBuilder.prepare();
+			
+			Log.d(getClass().getSimpleName(),  " PreparedQuery: " + preparedQuery.toString());
+			discussionEntries = discussionEntryDao.query(preparedQuery);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return discussionEntries;
+	}
 
 	public DiscussionEntry newDiscussionEntry() {
 		DiscussionEntry discussionEntry = new DiscussionEntry();
