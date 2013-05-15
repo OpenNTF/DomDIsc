@@ -27,12 +27,14 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
 
 
 
@@ -43,7 +45,8 @@ import com.actionbarsherlock.view.MenuItem;
  *
  */
 
-public class StartActivity extends SherlockFragmentActivity implements ActionBar.OnNavigationListener, DiscussionMainEntriesViewFragment.OnItemSelectedListener, ReadDiscussionEntryFragment.OnResponseItemSelectedListener {
+public class StartActivity extends SherlockFragmentActivity implements ActionBar.OnNavigationListener, DiscussionMainEntriesViewFragment.OnItemSelectedListener, ReadDiscussionEntryFragment.OnResponseItemSelectedListener, SearchView.OnQueryTextListener
+ {
 	DiscussionDatabase discussionDatabase;
 	List<DiscussionDatabase> allDiscussionDatabases = null;
 	ArrayList<String> spinnerSelectionList = null;
@@ -86,21 +89,21 @@ public class StartActivity extends SherlockFragmentActivity implements ActionBar
 		super.onStart();
 		DatabaseManager.init(this);
 		handleUpgradeCheck();
-
+		ApplicationLog.d(getClass().getSimpleName() + " onStart", shouldCommitToLog);
 		initializeDatabaseDisplay();
-
 	}
 	
 	
 	@Override 
 	protected void onResume() {
 		super.onResume();
-		
-		//We might be returning from the configurations Activity and want to display the updated list of Databases in the spinner
-		
-		if(discussionDatabase == null) {
-			initializeDatabaseDisplay();
-		}
+//		ApplicationLog.d(getClass().getSimpleName() + " onResume", shouldCommitToLog);
+//		
+//		//We might be returning from the configurations Activity and want to display the updated list of Databases in the spinner
+//		
+//		if(discussionDatabase == null) {
+//			initializeDatabaseDisplay();
+//		}
 	}
 
 
@@ -171,10 +174,34 @@ public class StartActivity extends SherlockFragmentActivity implements ActionBar
 		ApplicationLog.d(getClass().getSimpleName() + " onCreateOptionsMenu start", shouldCommitToLog);
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_discussion_entries_view, menu);
+		//Search start
+		SearchView searchView = new SearchView(getSupportActionBar().getThemedContext());
+		searchView.setQueryHint("Search for countries…");
+        searchView.setOnQueryTextListener(this);
+        menu.add("Search")
+        .setIcon(R.drawable.ic_action_search)
+        .setActionView(searchView)
+        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+        //Search end
 		// disable the home button and the up affordance:
 		getSupportActionBar().setHomeButtonEnabled(false);
+		
 		return true;
 	}
+	
+	//Search start
+	 @Override
+	    public boolean onQueryTextSubmit(String query) {
+	        Toast.makeText(this, "You searched for: " + query, Toast.LENGTH_LONG).show();
+	        setupListView(discussionDatabase, query);
+	        return true;
+	    }
+	 
+	 @Override
+	    public boolean onQueryTextChange(String newText) {
+	        return false;
+	    }
+	 //Search end
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -222,6 +249,14 @@ public class StartActivity extends SherlockFragmentActivity implements ActionBar
 		// TODO Auto-generated method stub
 		DiscussionMainEntriesViewFragment fragment = (DiscussionMainEntriesViewFragment) getSupportFragmentManager().findFragmentById(R.id.discussionMainEntriesFragment);
 		fragment.setDiscussionDatabase(discussionDatabase);
+	}
+	
+	/** 
+	 * Give me a DiscussionDatabase to show and a query to limit what is shown. Feeds it to the fragment
+	 */
+	private void setupListView(DiscussionDatabase discussionDatabase, String query) {
+		DiscussionMainEntriesViewFragment fragment = (DiscussionMainEntriesViewFragment) getSupportFragmentManager().findFragmentById(R.id.discussionMainEntriesFragment);
+		fragment.setDiscussionDatabase(discussionDatabase, query);
 	}
 
 

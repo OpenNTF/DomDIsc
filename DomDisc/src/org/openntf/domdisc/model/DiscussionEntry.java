@@ -86,7 +86,9 @@ public class DiscussionEntry {
 	private String newsLetterSubject; //test5
 	@DatabaseField
 	private String path_Info; //"\/androiddev\/discussi.nsf\/MainTopic?CreateDocument"
-	@DatabaseField
+	
+	public static final String SUBJECT_FIELD_NAME = "subject";  //accessible from outside to enable querying using the column name
+	@DatabaseField (columnName = SUBJECT_FIELD_NAME)
 	private String subject; //test5
 	@DatabaseField
 	private String categories; //Fra Android
