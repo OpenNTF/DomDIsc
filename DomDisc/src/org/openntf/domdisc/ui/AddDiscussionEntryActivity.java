@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -27,6 +28,7 @@ public class AddDiscussionEntryActivity extends SherlockActivity {
 	private EditText editSubject;
 	private EditText editBody;
 	private EditText editCategories;
+	private Spinner chooseCategories;
 	private DiscussionDatabase discussionDatabase;
 	private DiscussionEntry parentDiscussionEntry;
 	private boolean shouldCommitToLog = false;
@@ -42,8 +44,9 @@ public class AddDiscussionEntryActivity extends SherlockActivity {
         editSubject = (EditText) contentView.findViewById(R.id.edit_subject);
         editBody = (EditText) contentView.findViewById(R.id.edit_body);
         editCategories = (EditText) contentView.findViewById(R.id.edit_categories);
+        chooseCategories = (Spinner) contentView.findViewById(R.id.choose_categories);
+//        chooseCategories.
 
-        setContentView(contentView);
         
         setupDiscussionDatabaseAndParent();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

@@ -2,6 +2,8 @@ package org.openntf.domdisc.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import android.util.Log;
 
@@ -72,20 +74,29 @@ public class DiscussionDatabase {
 	}
 	
 	public List<DiscussionEntry> getMainEntries() {
-//		Log.d(getClass().getSimpleName(), "getMainEntries");
 		ArrayList<DiscussionEntry> itemList = new ArrayList<DiscussionEntry>();
 		for (DiscussionEntry discussionEntry : discussionEntries) {
-//			Log.d(getClass().getSimpleName(), " checking 0 : " + discussionEntry.getSubject());
 			String parentid = discussionEntry.getParentid();
 			if (parentid == null || parentid.length() == 0) {
 				itemList.add(discussionEntry);	
-//				Log.d(getClass().getSimpleName(), "  added to list");
-			} else {
-//				Log.d(getClass().getSimpleName(), "  not added to list ");
-//				Log.d(getClass().getSimpleName(), "  parentid is>" + parentid + "<");
 			}
 		}
 		return itemList;
+	}
+	
+	/**
+	 * @return a Set of categories used in the DiscussionDatabase
+	 */
+	public Set<String> getCategories() {
+		Set<String> returnSet = new TreeSet<String>();
+		
+		for (DiscussionEntry discussionEntry : discussionEntries) {
+			String category = discussionEntry.getCategories();
+			if (category != null && category.length() > 0) {
+				returnSet.add(category);	
+			}
+		}
+		return returnSet;
 	}
 
 	public String getHostName() {
