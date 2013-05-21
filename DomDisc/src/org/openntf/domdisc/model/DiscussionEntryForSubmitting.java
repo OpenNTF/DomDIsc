@@ -11,6 +11,7 @@ public class DiscussionEntryForSubmitting {
 	private String body;
 	private String subject; 
 	private String categories;
+	private String webcategories;
 	private String parentid;
 	
 	public String getForm() {
@@ -36,6 +37,9 @@ public class DiscussionEntryForSubmitting {
 	}
 	public void setCategories(String categories) {
 		this.categories = categories;
+		if (this.webcategories == null) {
+			this.webcategories = categories;
+		}
 	}
 	
 	public String getParentid() {
@@ -44,6 +48,13 @@ public class DiscussionEntryForSubmitting {
 	public void setParentid(String parentid) {
 		this.parentid = parentid;
 	}
+	
+	public String getWebcategories() {
+		return webcategories;
+	}
+	public void setWebcategories(String webcategories) {
+		this.webcategories = webcategories;
+	}
 	/**
 	 * @param discussionEntry
 	 * Feed me a DiscussionEntry and I populate this object with the fields that i CAN hold
@@ -51,6 +62,13 @@ public class DiscussionEntryForSubmitting {
 	public void createFromDiscussionEntry(DiscussionEntry discussionEntry) {
 		setBody(discussionEntry.getBody());
 		setCategories(discussionEntry.getCategories());
+		//Doing this because the design of the Domino discussion Database expects categories to be inserted through the webCategories field
+		if (discussionEntry.getWebCategories() != null && discussionEntry.getWebCategories().length()>0) {
+			setWebcategories(discussionEntry.getWebCategories());
+		} else {
+			setWebcategories(discussionEntry.getCategories());
+		}
+		
 		setForm(discussionEntry.getForm());
 		setSubject(discussionEntry.getSubject());
 		setParentid(discussionEntry.getParentid());

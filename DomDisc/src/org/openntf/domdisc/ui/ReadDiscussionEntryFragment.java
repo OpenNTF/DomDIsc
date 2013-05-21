@@ -3,42 +3,35 @@ package org.openntf.domdisc.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openntf.domdisc.R;
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.general.Constants;
 import org.openntf.domdisc.model.DiscussionEntry;
-import org.openntf.domdisc.ui.DiscussionMainEntriesViewFragment.OnItemSelectedListener;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-
-import org.openntf.domdisc.R;
 
 public class ReadDiscussionEntryFragment extends SherlockFragment implements OnClickListener {
 
@@ -289,13 +282,13 @@ public final static int create_menu_id = 9874;
 	
 
 	private void populateBody() {
-		ApplicationLog.d(getClass().getSimpleName() +  " building body", shouldCommitToLog);
+//		ApplicationLog.d(getClass().getSimpleName() +  " building body", shouldCommitToLog);
 		String bodyHtml = currentDiscussionEntry.getBody() ;
 		webView.loadDataWithBaseURL(null, bodyHtml, "text/html", "UTF-8", null);
 	}
 
 	private void populateHeader() {
-		ApplicationLog.d(getClass().getSimpleName() +  " building header", shouldCommitToLog);
+//		ApplicationLog.d(getClass().getSimpleName() +  " building header", shouldCommitToLog);
 		String subject = currentDiscussionEntry.getSubject();
 		String abbrFrom = currentDiscussionEntry.getAbbreviateFrom();
 		String authorToDisplay = "";

@@ -22,18 +22,17 @@
         android:layout_height="wrap_content"
         android:text="@string/categories" 
         android:layout_marginTop="10dp"/>
+    <Spinner 
+        android:id="@+id/choose_categories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
     <EditText
         android:id="@+id/edit_categories"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="1" 
         android:hint="@string/category_hint"
-        />
-    
-    <Spinner 
-        android:id="@+id/choose_categories"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         />
     
     <TextView
@@ -44,8 +43,8 @@
     <EditText
         android:id="@+id/edit_body"
         android:layout_width="match_parent"
-        android:layout_height="87dp"
-        android:maxLines="3"
+        android:layout_height="match_parent"
+        android:maxLines="50"
         android:scrollHorizontally="false" 
         android:hint="@string/body_hint"
         />

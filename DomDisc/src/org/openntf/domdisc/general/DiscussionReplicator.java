@@ -167,6 +167,7 @@ public class DiscussionReplicator {
 	private String submitDiscussionEntry(DiscussionEntry discussionEntry, String urlForDocuments,	String authenticationCookie) {
 		String returnString = "";
 
+		//Using a simple class to hold what gets submitted - keeps things simpler
 		DiscussionEntryForSubmitting entryToSubmit = new DiscussionEntryForSubmitting();
 		entryToSubmit.createFromDiscussionEntry(discussionEntry);
 
@@ -202,28 +203,37 @@ public class DiscussionReplicator {
 		restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
 
 		ApplicationLog.d(getClass().getSimpleName() + "POST to " + url, shouldCommitToLog);
-		ResponseEntity<String> httpResponse = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-
-		ApplicationLog.d(getClass().getSimpleName() + " resultString: " + httpResponse.toString(), shouldCommitToLog);
-		ApplicationLog.d(getClass().getSimpleName() + " statuscode: " + httpResponse.getStatusCode().value(), shouldCommitToLog);
-		if (httpResponse.hasBody()) {
-			ApplicationLog.d(getClass().getSimpleName() + " body: " + httpResponse.getBody().toString(), shouldCommitToLog);
-		} else {
-			ApplicationLog.d(getClass().getSimpleName() + " body: None received" , shouldCommitToLog);
-		}
-
-		HttpHeaders responseHeaders = httpResponse.getHeaders();
-		if (responseHeaders.isEmpty()) {
-			ApplicationLog.d("No response headers - then the POST did not succeeed", shouldCommitToLog);
-		} else {
-			List<String> locationList = responseHeaders.get("Location");
-			if (null != locationList) {
-				String location = locationList.get(0);  //Assuming the header we are looking for will always be first - unlikely to have two
-				ApplicationLog.d("Location of newly created Note: " + location, shouldCommitToLog);
-				returnString = location;
+		ResponseEntity<String> httpResponse;
+		try {
+			httpResponse = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+			ApplicationLog.d(getClass().getSimpleName() + " resultString: " + httpResponse.toString(), shouldCommitToLog);
+			ApplicationLog.d(getClass().getSimpleName() + " statuscode: " + httpResponse.getStatusCode().value(), shouldCommitToLog);
+			if (httpResponse.hasBody()) {
+				ApplicationLog.d(getClass().getSimpleName() + " body: " + httpResponse.getBody().toString(), shouldCommitToLog);
+			} else {
+				ApplicationLog.d(getClass().getSimpleName() + " body: None received" , shouldCommitToLog);
 			}
-		}
 
+			HttpHeaders responseHeaders = httpResponse.getHeaders();
+			if (responseHeaders.isEmpty()) {
+				ApplicationLog.d("No response headers - then the POST did not succeeed", shouldCommitToLog);
+			} else {
+				List<String> locationList = responseHeaders.get("Location");
+				if (null != locationList) {
+					String location = locationList.get(0);  //Assuming the header we are looking for will always be first - unlikely to have two
+					ApplicationLog.d("Location of newly created Note: " + location, shouldCommitToLog);
+					returnString = location;
+				}
+			}
+		} catch (RestClientException e) {
+			e.printStackTrace();
+			String errorMessage = e.getMessage();
+			if (errorMessage == null) {
+				errorMessage = "Error message not available";
+			}
+			ApplicationLog.e("Exception: " + errorMessage);
+
+		}
 		return returnString;
 	}
 

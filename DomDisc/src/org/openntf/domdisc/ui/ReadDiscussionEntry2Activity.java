@@ -1,25 +1,21 @@
 package org.openntf.domdisc.ui;
 
+import org.openntf.domdisc.R;
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.model.DiscussionEntry;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
-
-import org.openntf.domdisc.R;
 
 
 
@@ -57,7 +53,7 @@ public class ReadDiscussionEntry2Activity extends SherlockFragmentActivity imple
 				FrameLayout containerForReadDiscussionEntryFragment = (FrameLayout) findViewById(R.id.discussionEntryFragment);
 
 				if (containerForReadDiscussionEntryFragment != null) {
-					ApplicationLog.d(getClass().getSimpleName() + " fragment is in layout", shouldCommitToLog);
+//					ApplicationLog.d(getClass().getSimpleName() + " fragment is in layout", shouldCommitToLog);
 
 					// Instantiate a new fragment.
 					ReadDiscussionEntryFragment newFragment = ReadDiscussionEntryFragment.newInstance(unid);
@@ -68,7 +64,7 @@ public class ReadDiscussionEntry2Activity extends SherlockFragmentActivity imple
 					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 					//			        ft.addToBackStack(null);
 					ft.commit();
-					ApplicationLog.d(getClass().getSimpleName() + "FragmentTransaction committed", shouldCommitToLog);
+//					ApplicationLog.d(getClass().getSimpleName() + "FragmentTransaction committed", shouldCommitToLog);
 				} else {
 					ApplicationLog.w(getClass().getSimpleName() + " Did not find the fragment container");
 				}
@@ -132,7 +128,7 @@ public class ReadDiscussionEntry2Activity extends SherlockFragmentActivity imple
 
 			// If the fragment is visible - feed it the DiscussionEntry. If not - launch a new Activity with the unid of the DiscussionEntry
 			if (containerForReadDiscussionEntryFragment != null) {
-				ApplicationLog.d(getClass().getSimpleName() + " fragment is in layout", shouldCommitToLog);
+//				ApplicationLog.d(getClass().getSimpleName() + " fragment is in layout", shouldCommitToLog);
 
 				// Instantiate a new fragment.
 				ReadDiscussionEntryFragment newFragment = ReadDiscussionEntryFragment.newInstance(unid);
@@ -143,12 +139,11 @@ public class ReadDiscussionEntry2Activity extends SherlockFragmentActivity imple
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 				ft.addToBackStack(null);
 				ft.commit();
-				ApplicationLog.d(getClass().getSimpleName() + "FragmentTransaction committed", shouldCommitToLog);
+//				ApplicationLog.d(getClass().getSimpleName() + "FragmentTransaction committed", shouldCommitToLog);
 				//			        newFragment.setDiscussionEntry(selectedEntry);
 			} else {
 				ApplicationLog.d(getClass().getSimpleName() + " fragment is not layout. Launching new ReadDiscussionEntry2Activity", shouldCommitToLog);
-				Intent intent = new Intent(getApplicationContext(),
-						ReadDiscussionEntry2Activity.class);
+				Intent intent = new Intent(getApplicationContext(),ReadDiscussionEntry2Activity.class);
 				intent.putExtra(ReadDiscussionEntry2Activity.EXTRA_URL, unid);
 				startActivity(intent);
 			}
