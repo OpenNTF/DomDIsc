@@ -1,12 +1,14 @@
 package org.openntf.domdisc.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.model.DiscussionDatabase;
 import org.openntf.domdisc.model.DiscussionEntry;
+import org.openntf.domdisc.model.DiscussionEntryModifiedComparable;
 
 import android.app.Activity;
 import android.content.Context;
@@ -63,16 +65,35 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 	
 	
 	public void setDiscussionDatabase(DiscussionDatabase discussionDatabase) {
-		currentDiscussionDatabase = discussionDatabase;
-		currentSearchQuery = "";
-		populateListView();
+//		currentDiscussionDatabase = discussionDatabase;
+//		currentSearchQuery = "";
+//		populateListView();
+		
+		if (currentDiscussionDatabase == null) {
+			currentDiscussionDatabase = discussionDatabase;
+			currentSearchQuery = "";
+			populateListView();
+		} else if(currentDiscussionDatabase.equals(discussionDatabase) && currentSearchQuery.equals("")) {
+			ApplicationLog.d(getClass().getSimpleName() + " setDiscussionDatabase: No Change in query - ignoring", shouldCommitToLog);
+		} else {
+			currentDiscussionDatabase = discussionDatabase;
+			currentSearchQuery = "";
+			populateListView();	
+		}
 	}
 	
 	public void setDiscussionDatabase(DiscussionDatabase discussionDatabase, String searchString) {
-		currentDiscussionDatabase = discussionDatabase;
-		currentSearchQuery = searchString;
-		populateListView();
-		
+		if (currentDiscussionDatabase == null) {
+			currentDiscussionDatabase = discussionDatabase;
+			currentSearchQuery = searchString;
+			populateListView();
+		} else if(currentDiscussionDatabase.equals(discussionDatabase) && currentSearchQuery.equals(searchString)) {
+			ApplicationLog.d(getClass().getSimpleName() + " setDiscussionDatabase: No Change in query - ignoring", shouldCommitToLog);
+		} else {
+			currentDiscussionDatabase = discussionDatabase;
+			currentSearchQuery = searchString;
+			populateListView();	
+		}
 	}
 
 	private void populateListView() {
@@ -89,18 +110,23 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 			}
 			ApplicationLog.d(getClass().getSimpleName() + " tempDiscussionEntries.count: " + tempDiscussionEntries.size(), shouldCommitToLog);
 			
+			
+			
 			final List<DiscussionEntry> discussionEntries = tempDiscussionEntries;
 			
-//			List<DiscussionEntry> discussionEntries = currentDiscussionDatabase.getMainEntries();
-			
-			//Removed final
-			
-			
-//			List<DiscussionEntry> discussionEntriesByQuery = DatabaseManager.getInstance().getMainDiscussionEntriesByQuery(currentDiscussionDatabase, currentSearchQuery);
-//XX						
+			ApplicationLog.d(getClass().getSimpleName() + " populateListview - sorting", shouldCommitToLog);
+			Collections.sort(discussionEntries, new DiscussionEntryModifiedComparable());
+				
 			List<String> titles = new ArrayList<String>();
 			for (DiscussionEntry discussionEntry : discussionEntries) {
-				titles.add(discussionEntry.getSubject());
+				String title = discussionEntry.getSubject();
+				String modified = discussionEntry.getModified();
+				if (modified == null) {
+					modified = "?";
+				} else {
+					modified = modified.substring(0, 10);
+				}
+				titles.add(title + " (" + modified + ")");
 			}
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1, titles);
 			listView.setAdapter(adapter);

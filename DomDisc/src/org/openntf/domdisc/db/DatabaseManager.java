@@ -166,7 +166,7 @@ public class DatabaseManager {
 			where.like(DiscussionEntry.SUBJECT_FIELD_NAME, "%" + query + "%");
 			where.and();
 			where.eq(DiscussionEntry.DISCUSSIONDB_FIELD_NAME, discussionDatabase);
-			
+						
 			PreparedQuery<DiscussionEntry> preparedQuery = queryBuilder.prepare();
 			
 			Log.d(getClass().getSimpleName(),  " PreparedQuery: " + preparedQuery.toString());

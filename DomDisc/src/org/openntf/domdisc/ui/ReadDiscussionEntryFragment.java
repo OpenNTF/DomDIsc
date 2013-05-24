@@ -1,6 +1,7 @@
 package org.openntf.domdisc.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.openntf.domdisc.R;
@@ -8,6 +9,7 @@ import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.general.Constants;
 import org.openntf.domdisc.model.DiscussionEntry;
+import org.openntf.domdisc.model.DiscussionEntryModifiedComparable;
 
 import android.app.Activity;
 import android.content.Context;
@@ -251,9 +253,21 @@ public final static int create_menu_id = 9874;
 			ApplicationLog.d(getClass().getSimpleName() + " number of responses: " + responseCount, shouldCommitToLog);
 			
 			if (responseCount > 0) {
+				Collections.sort(responseEntries, new DiscussionEntryModifiedComparable());
+
 				List<String> titles = new ArrayList<String>();
 				for (DiscussionEntry responseEntry : responseEntries) {
-					titles.add(responseEntry.getSubject());
+					
+					String title = responseEntry.getSubject();
+					String modified = responseEntry.getModified();
+					if (modified == null) {
+						modified = "?";
+					} else {
+						modified = modified.substring(0, 10);
+					}
+					titles.add(title + " (" + modified + ")");
+					
+//					titles.add(responseEntry.getSubject());
 				}
 				adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, titles);
 				responseView.setAdapter(adapter);

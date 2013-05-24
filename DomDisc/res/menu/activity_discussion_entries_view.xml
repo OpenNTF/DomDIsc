@@ -4,7 +4,7 @@
 	<item android:id="@+id/menu_compose_document"
 		android:showAsAction="ifRoom" android:title="@string/menu_compose_document"
 		android:titleCondensed="@string/menu_compose_document" android:icon="@drawable/content_new" />
-
+	
 	<item android:id="@+id/menu_refresh" android:title="@string/menu_refresh"
 		android:orderInCategory="100" android:showAsAction="ifRoom"
 		android:icon="@drawable/navigation_refresh" />

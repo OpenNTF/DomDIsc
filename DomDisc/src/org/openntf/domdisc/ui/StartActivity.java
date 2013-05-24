@@ -1,9 +1,9 @@
 package org.openntf.domdisc.ui;
 
 import java.util.ArrayList;
-import org.openntf.domdisc.R;
 import java.util.List;
 
+import org.openntf.domdisc.R;
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.general.Constants;
@@ -27,7 +27,6 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -174,15 +173,19 @@ public class StartActivity extends SherlockFragmentActivity implements ActionBar
 		ApplicationLog.d(getClass().getSimpleName() + " onCreateOptionsMenu start", shouldCommitToLog);
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_discussion_entries_view, menu);
-		//Search start
-		SearchView searchView = new SearchView(getSupportActionBar().getThemedContext());
-		searchView.setQueryHint("Search for countries…");
-        searchView.setOnQueryTextListener(this);
-        menu.add("Search")
-        .setIcon(R.drawable.ic_action_search)
-        .setActionView(searchView)
-        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-        //Search end
+
+		// Disabled for the time being - did not work properly in tablet UI
+//		//Search start
+//		//This is not the proper way of adding search - but I could not get it to work through the menu xml file
+//		SearchView searchView = new SearchView(getSupportActionBar().getThemedContext());
+//		searchView.setQueryHint("search titles");
+//        searchView.setOnQueryTextListener(this);
+//        menu.add("Search")
+//        .setIcon(R.drawable.action_search)
+//        .setActionView(searchView)
+//        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+//        //Search end
+        
 		// disable the home button and the up affordance:
 		getSupportActionBar().setHomeButtonEnabled(false);
 		
@@ -192,14 +195,22 @@ public class StartActivity extends SherlockFragmentActivity implements ActionBar
 	//Search start
 	 @Override
 	    public boolean onQueryTextSubmit(String query) {
-	        Toast.makeText(this, "You searched for: " + query, Toast.LENGTH_LONG).show();
+		 ApplicationLog.d(getClass().getSimpleName() + " onQueryTextSubmit - " + query, shouldCommitToLog);
+//	        Toast.makeText(this, "You searched for: " + query, Toast.LENGTH_LONG).show();
 	        setupListView(discussionDatabase, query);
 	        return true;
 	    }
 	 
 	 @Override
 	    public boolean onQueryTextChange(String newText) {
-	        return false;
+		 ApplicationLog.d(getClass().getSimpleName() + " onQueryTextChange - " + newText, shouldCommitToLog);
+		 if (newText.contentEquals("")) {
+			 setupListView(discussionDatabase, newText);
+			 return true;
+		 } else {
+			 return false; 
+		 }
+	        
 	    }
 	 //Search end
 

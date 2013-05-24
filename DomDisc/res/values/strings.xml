@@ -46,6 +46,7 @@
     
     <string name="categories">Categories:</string>
     <string name="category_hint">Optional: A new category instead of the existing ones</string>
+    <string name="category_default">Choose category</string>
     
     <string name="body">Body:</string>
     <string name="body_hint">Enter the main body text</string>

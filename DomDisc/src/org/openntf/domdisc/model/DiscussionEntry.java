@@ -95,15 +95,16 @@ public class DiscussionEntry {
 	@DatabaseField
 	private String abstractDoc; // ændret navn Abstract. Tilf\u00F8jet til test5 body
 
+	// Fields that are not part of the JSON received from the server
+
+	@DatabaseField
+	private String threadLastModifiedDate;
+	
+	
+	
 	/*
 	 * Getters og setters
 	 */
-//	public int getId() {
-//		return id;
-//	}
-//	public void setId(int id) {
-//		this.id = id;
-//	}
 	
 	public DiscussionDatabase getDiscussionDatabase() {
 		return discussionDatabase;
@@ -257,8 +258,13 @@ public class DiscussionEntry {
 	public void setAbstractDoc(String abstractDoc) {
 		this.abstractDoc = abstractDoc;
 	}
-	
-	
+
+	public String getThreadLastModifiedDate() {
+		return threadLastModifiedDate;
+	}
+	public void setThreadLastModifiedDate(String threadLastModifiedDate) {
+		this.threadLastModifiedDate = threadLastModifiedDate;
+	}	
 
 	
 }

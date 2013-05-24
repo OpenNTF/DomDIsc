@@ -36,12 +36,14 @@ public class AddDiscussionEntryActivity extends SherlockActivity {
 	private DiscussionDatabase discussionDatabase;
 	private DiscussionEntry parentDiscussionEntry;
 	private boolean shouldCommitToLog = false;
+	private String defaultCategoryString = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		shouldCommitToLog = getLogALot(this);
 		ApplicationLog.d(getClass().getSimpleName() + " onCreate", shouldCommitToLog);
+		defaultCategoryString = getResources().getString(R.string.category_default);
 		
 		DatabaseManager.init(getApplicationContext());
         ViewGroup contentView = (ViewGroup) getLayoutInflater().inflate(R.layout.add_discussion_entry, null);
@@ -55,6 +57,7 @@ public class AddDiscussionEntryActivity extends SherlockActivity {
         Set<String> databaseCategoriesSet =  discussionDatabase.getCategories();
         
         List<String> list = new ArrayList<String>();
+        list.add(defaultCategoryString);
         list.addAll(databaseCategoriesSet);
         
         ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, list);
@@ -144,7 +147,7 @@ public class AddDiscussionEntryActivity extends SherlockActivity {
 				if (optionalCategory != null && optionalCategory.length()>0) {
 					discussionEntry.setCategories(optionalCategory);
 					ApplicationLog.d(getClass().getSimpleName() + " Category: " + optionalCategory, shouldCommitToLog);
-				} else if (category != null && category.length()>0 ) {
+				} else if (category != null && category.length()>0 && !category.contentEquals(defaultCategoryString)) {
 					discussionEntry.setCategories(category);	
 					ApplicationLog.d(getClass().getSimpleName() + " Category: " + category, shouldCommitToLog);
 				}
