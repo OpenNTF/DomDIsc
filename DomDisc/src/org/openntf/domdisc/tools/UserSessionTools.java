@@ -80,7 +80,7 @@ public class UserSessionTools {
 		editor.putString("sortPreference", sortPreference);
 
 		 DatabaseManager.init(context);
-		 ApplicationLog.d("Set sortPreference: " + sortPreference, true);
+//		 ApplicationLog.d("Set sortPreference: " + sortPreference, true);
 
 		// Commit the edits!
 		editor.commit();
@@ -92,7 +92,7 @@ public class UserSessionTools {
 		String sortPreference = prefs.getString("sortPreference", context.getResources().getString(R.string.menu_sort_hottest));
 
 		 DatabaseManager.init(context);
-		 ApplicationLog.d("Read sortPreference: " + sortPreference, true);
+//		 ApplicationLog.d("Read sortPreference: " + sortPreference, true);
 
 		return sortPreference;
 
