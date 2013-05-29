@@ -15,5 +15,14 @@
 
 	<item android:id="@+id/menu_log" android:showAsAction="never"
 		android:title="@string/menu_log" android:titleCondensed="@string/menu_log" />
-
+	
+	<item android:id="@+id/menu_sort" android:showAsAction="never"
+	    android:title="@string/menu_sort" android:titleCondensed="@string/menu_sort">
+	    <menu >
+	        <item android:id="@+id/menu_sortnewest" android:title="@string/menu_sort_newest"/>
+	        <item android:id="@+id/menu_sorthottest" android:title="@string/menu_sort_hottest"/>
+	    </menu>
+	</item>
+	
+	
 </menu>

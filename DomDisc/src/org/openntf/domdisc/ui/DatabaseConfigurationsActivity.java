@@ -16,6 +16,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -32,14 +33,16 @@ import org.openntf.domdisc.R;
 
 public class DatabaseConfigurationsActivity extends SherlockActivity {
 	ListView listView;
-	boolean logALot = false;
+	boolean shouldCommitToLog = false;
+	View helpLayout;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		DatabaseManager.init(this);
-		logALot = getLogALot(this);
+		shouldCommitToLog = getLogALot(this);
 		//        ApplicationLog.w("dims med warning fra main");
 
 		//        PollReceiver.scheduleAlarms(this);
@@ -51,7 +54,29 @@ public class DatabaseConfigurationsActivity extends SherlockActivity {
 		//        Button btn = (Button) contentView.findViewById(R.id.button_add);
 		//        setupButton(btn);
 		setContentView(contentView);
+		
+		helpLayout = findViewById(R.id.top_layout);
+		if (!hasNoConfiguration()) {
+			helpLayout.setVisibility(View.INVISIBLE);
+		} else {
+			helpLayout.setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					helpLayout.setVisibility(View.INVISIBLE);
+					return false;
+				}
+
+			});
+		}
+		
+//		helpLayout = findViewById(R.id.top_layout);
+//		if (isNotFirstTimeSeeingConfigurationActivity()) {
+//			ApplicationLog.d("Has seen hint before - hiding it", shouldCommitToLog);
+//			helpLayout.setVisibility(View.INVISIBLE);
+//		}
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		
 	}
 
 	@Override
@@ -63,10 +88,10 @@ public class DatabaseConfigurationsActivity extends SherlockActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		logALot = getLogALot(this);
+		shouldCommitToLog = getLogALot(this);
 		DatabaseManager.init(this);
 
-		ApplicationLog.d("On resume in configurations view - calling scheduler", logALot);
+		ApplicationLog.d("On resume in configurations view - calling scheduler", shouldCommitToLog);
 		PollReceiver.scheduleAlarms(this);
 	}
 
@@ -149,6 +174,40 @@ public class DatabaseConfigurationsActivity extends SherlockActivity {
 	private static boolean getLogALot(Context ctxt) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
 		return prefs.getBoolean("checkbox_preference_logalot", false);
+	}
+	
+	// Sample code:
+	// http://www.christianpeeters.com/android-tutorials/android-tutorial-overlay-with-user-instructions/
+	private boolean isNotFirstTimeSeeingConfigurationActivity() {
+		SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+//		boolean hasSeenConfigurationBefore = preferences.getBoolean("hasSeenConfigurationBefore", false);
+		boolean hasSeenConfigurationBefore = false;
+		if (!hasSeenConfigurationBefore) {
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putBoolean("hasSeenConfigurationBefore", true);
+			editor.commit();
+			helpLayout.setVisibility(View.VISIBLE);
+			helpLayout.setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					helpLayout.setVisibility(View.INVISIBLE);
+					return false;
+				}
+
+			});
+
+		}
+		return hasSeenConfigurationBefore;
+
+	}
+	
+	private boolean hasNoConfiguration() {
+		List<DiscussionDatabase> discussionDatabases = DatabaseManager.getInstance().getAllDiscussionDatabases();
+		if (discussionDatabases == null || discussionDatabases.size()<1) {
+			return true;
+		} else {
+			return false;
+		}	
 	}
 
 	//    private void setupButton(Button btn) {

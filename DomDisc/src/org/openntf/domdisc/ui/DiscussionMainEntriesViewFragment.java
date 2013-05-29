@@ -2,6 +2,7 @@ package org.openntf.domdisc.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.openntf.domdisc.db.DatabaseManager;
@@ -9,6 +10,8 @@ import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.model.DiscussionDatabase;
 import org.openntf.domdisc.model.DiscussionEntry;
 import org.openntf.domdisc.model.DiscussionEntryModifiedComparable;
+import org.openntf.domdisc.model.DiscussionEntryThreadModifiedComparable;
+import org.openntf.domdisc.tools.UserSessionTools;
 
 import android.app.Activity;
 import android.content.Context;
@@ -36,14 +39,13 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 	private DiscussionDatabase currentDiscussionDatabase = null;
 	private String currentSearchQuery = "";
 	private boolean shouldCommitToLog = false;
-
-
-
+	String sortPreference = "";
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		DatabaseManager.init(getActivity());
 		shouldCommitToLog = getLogALot(getActivity());
+		sortPreference = UserSessionTools.getSortPreference(getActivity());
 		View view = inflater.inflate(R.layout.discussion_entry_list, container, false);
 		listView = (ListView) view.findViewById(R.id.list_view);
 		return view;
@@ -73,8 +75,6 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 			currentDiscussionDatabase = discussionDatabase;
 			currentSearchQuery = "";
 			populateListView();
-		} else if(currentDiscussionDatabase.equals(discussionDatabase) && currentSearchQuery.equals("")) {
-			ApplicationLog.d(getClass().getSimpleName() + " setDiscussionDatabase: No Change in query - ignoring", shouldCommitToLog);
 		} else {
 			currentDiscussionDatabase = discussionDatabase;
 			currentSearchQuery = "";
@@ -87,8 +87,6 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 			currentDiscussionDatabase = discussionDatabase;
 			currentSearchQuery = searchString;
 			populateListView();
-		} else if(currentDiscussionDatabase.equals(discussionDatabase) && currentSearchQuery.equals(searchString)) {
-			ApplicationLog.d(getClass().getSimpleName() + " setDiscussionDatabase: No Change in query - ignoring", shouldCommitToLog);
 		} else {
 			currentDiscussionDatabase = discussionDatabase;
 			currentSearchQuery = searchString;
@@ -98,9 +96,8 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 
 	private void populateListView() {
 		if (null != currentDiscussionDatabase) {
-//			final List<DiscussionEntry> discussionEntries = currentDiscussionDatabase.getDiscussionEntries();
 			ApplicationLog.d(getClass().getSimpleName() + " populateListView", shouldCommitToLog);
-			
+			sortPreference = UserSessionTools.getSortPreference(getActivity()); //refresh if changed
 			List<DiscussionEntry> tempDiscussionEntries = null;
 			
 			if(currentSearchQuery != "") {
@@ -110,12 +107,28 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 			}
 			ApplicationLog.d(getClass().getSimpleName() + " tempDiscussionEntries.count: " + tempDiscussionEntries.size(), shouldCommitToLog);
 			
-			
-			
 			final List<DiscussionEntry> discussionEntries = tempDiscussionEntries;
 			
+//			ApplicationLog.d(getClass().getSimpleName() + " populateListview - sorting", shouldCommitToLog);
+//			Collections.sort(discussionEntries, new DiscussionEntryModifiedComparable());
+//			
+			
+			Comparator preferredSortMechanism = null;
+			String hottestSortString = getResources().getString(R.string.menu_sort_hottest);
+			String dateSortString = getResources().getString(R.string.menu_sort_newest);
+			if(sortPreference.contentEquals(hottestSortString) ) {
+				preferredSortMechanism = new DiscussionEntryThreadModifiedComparable();
+			} else if (sortPreference.contentEquals(dateSortString) ) {
+				preferredSortMechanism = new DiscussionEntryModifiedComparable();
+			} else {
+				preferredSortMechanism = new DiscussionEntryModifiedComparable();
+			}
 			ApplicationLog.d(getClass().getSimpleName() + " populateListview - sorting", shouldCommitToLog);
-			Collections.sort(discussionEntries, new DiscussionEntryModifiedComparable());
+			ApplicationLog.d(getClass().getSimpleName() + " using " + preferredSortMechanism.getClass().getSimpleName(), shouldCommitToLog);
+			Collections.sort(discussionEntries, preferredSortMechanism);
+			
+			
+			
 				
 			List<String> titles = new ArrayList<String>();
 			for (DiscussionEntry discussionEntry : discussionEntries) {

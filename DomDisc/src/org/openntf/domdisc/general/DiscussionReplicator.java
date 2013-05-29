@@ -86,7 +86,6 @@ public class DiscussionReplicator {
 			}
 			String urlForDocuments = httpType + "://" + hostName;
 
-			// Flere portnumre her
 			if (httpPort.contentEquals("80") || httpPort.contentEquals("")) {
 				urlForDocuments = urlForDocuments + dbPath
 						+ "/api/data/documents/";
@@ -110,6 +109,7 @@ public class DiscussionReplicator {
 				// Any entries submitted will be deleted when the replicateServerToLocalDatabase runs (because the locally created entries' unids are not found in the downloaded entries)
 				if (replicateServerToLocalDatabase(discussionDatabase, hostName,urlForDocuments, authenticationCookie)) {
 					ApplicationLog.d(getClass().getSimpleName() + " Replication OK", shouldCommitToLog);
+					ApplicationLog.d(getClass().getSimpleName() + " - - - -", shouldCommitToLog);
 				} else {
 					ApplicationLog.w(getClass().getSimpleName() + " Replication server->database failed for " + discussionDatabase.getName());
 				}
@@ -414,7 +414,7 @@ public class DiscussionReplicator {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} // indsat slut her
+		} 
 
 
 		if((serverDiscussionEntryMap == null) || (serverDiscussionEntryMap.isEmpty())) {
@@ -445,7 +445,8 @@ public class DiscussionReplicator {
 					String entryForm = fullDiscussionEntry.getForm();
 					if (isAcceptableFormType(entryForm)) {
 						DatabaseManager.getInstance().createDiscussionEntry(fullDiscussionEntry);
-						ApplicationLog.d("This entry has been stored with values: " + fullDiscussionEntry.getSubject(), shouldCommitToLog);	
+						ApplicationLog.d("This entry has been stored with values: " + fullDiscussionEntry.getSubject(), shouldCommitToLog);
+						updateParentThreadDates(fullDiscussionEntry);
 					} else {
 						ApplicationLog.d("This entry has not been stored before, but the Form Type is not one of the accepted types. Will not store", shouldCommitToLog);
 					}
@@ -464,6 +465,7 @@ public class DiscussionReplicator {
 						fullDiscussionEntry.setDiscussionDatabase(discussionDatabase);
 						dbEntry = fullDiscussionEntry;
 						DatabaseManager.getInstance().updateDiscussionEntry(dbEntry);
+						updateParentThreadDates(dbEntry);
 					}
 				}
 			}
@@ -906,6 +908,33 @@ public class DiscussionReplicator {
 		}
 
 		return authenticationCookie;
+	}
+	
+	private void updateParentThreadDates(DiscussionEntry discussionEntry) {
+		ApplicationLog.d(getClass().getSimpleName() + " updateParentThreadDates for " + discussionEntry.getSubject(), shouldCommitToLog);
+		String parentId =discussionEntry.getParentid();
+		if (parentId != null && parentId.length()>0) {
+			DiscussionEntry parentEntry = DatabaseManager.getInstance().getDiscussionEntryWithId(parentId);
+			if (parentEntry != null) {
+				String parentThreadLastModifiedDate = parentEntry.getThreadLastModifiedDate();
+				String entryThreadLastModifiedDate = discussionEntry.getThreadLastModifiedDate();
+				ApplicationLog.d("updateParentThreadDates", shouldCommitToLog);
+				ApplicationLog.d("parentThreadLastModifiedDate: " + parentThreadLastModifiedDate, shouldCommitToLog);
+				ApplicationLog.d("entryThreadLastModifiedDate: " + entryThreadLastModifiedDate, shouldCommitToLog);
+				int compareValue = entryThreadLastModifiedDate.compareTo(parentThreadLastModifiedDate);
+				ApplicationLog.d("compareValue: " + compareValue, shouldCommitToLog);
+				if (compareValue>0) {
+					ApplicationLog.d("Will update parent Thread last mod to: " + entryThreadLastModifiedDate, shouldCommitToLog);
+					parentEntry.setThreadLastModifiedDate(entryThreadLastModifiedDate);
+					DatabaseManager.getInstance().updateDiscussionEntry(parentEntry);
+					updateParentThreadDates(parentEntry);
+				}
+			} else {
+				ApplicationLog.d("Parent not found in local db", shouldCommitToLog);
+			}
+		} else {
+			ApplicationLog.d("Does not have a parent", shouldCommitToLog);
+		}
 	}
 
 

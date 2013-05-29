@@ -98,7 +98,7 @@ public class DiscussionEntry {
 	// Fields that are not part of the JSON received from the server
 
 	@DatabaseField
-	private String threadLastModifiedDate;
+	private String threadLastModifiedDate = "";
 	
 	
 	
@@ -155,6 +155,7 @@ public class DiscussionEntry {
 	}
 	public void setModified(String modified) {
 		this.modified = modified;
+		this.threadLastModifiedDate = modified; // Note this !! - making sure lastmod has a date when first created
 	}
 	public String getAuthors() {
 		return authors;
@@ -258,9 +259,12 @@ public class DiscussionEntry {
 	public void setAbstractDoc(String abstractDoc) {
 		this.abstractDoc = abstractDoc;
 	}
-
 	public String getThreadLastModifiedDate() {
-		return threadLastModifiedDate;
+		if (threadLastModifiedDate == null) {
+			return modified;
+		} else {
+			return threadLastModifiedDate;	
+		}
 	}
 	public void setThreadLastModifiedDate(String threadLastModifiedDate) {
 		this.threadLastModifiedDate = threadLastModifiedDate;

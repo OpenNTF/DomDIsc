@@ -19,30 +19,59 @@
                 android:id="@+id/subject"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:text="subject here"
+                android:ems="14"
                 android:textIsSelectable="true" 
                 android:layout_span="2">
             </TextView>
         </TableRow>
-
-        <TableRow
+        <TableRow 
             android:id="@+id/tableRow2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
-            <TextView
+                        <TextView
                 android:id="@+id/author"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:text="author here"
+                android:textIsSelectable="true" 
+                android:layout_span="2">
+            </TextView>
+            
+        </TableRow>
+        
+<!--         <TableRow 
+            android:id="@+id/tableRow3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+                        <TextView
+                android:id="@+id/modified_thread_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:textIsSelectable="true" 
+                android:layout_span="2">
+            </TextView>
+            
+        </TableRow>
+ -->
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            
+            <TextView
+                android:id="@+id/modified_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
                 android:textIsSelectable="true" >
             </TextView>
 
             <Button
                 android:id="@+id/toggle_body_responses"
-                android:text="@string/toggle_body_responses_button_body_visible" />
+                android:text="@string/toggle_body_responses_button_body_visible" 
+                />
         </TableRow>
     </TableLayout>
 

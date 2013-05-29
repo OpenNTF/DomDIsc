@@ -2,6 +2,7 @@ package org.openntf.domdisc.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.openntf.domdisc.R;
@@ -10,6 +11,9 @@ import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.general.Constants;
 import org.openntf.domdisc.model.DiscussionEntry;
 import org.openntf.domdisc.model.DiscussionEntryModifiedComparable;
+import org.openntf.domdisc.model.DiscussionEntryThreadModifiedComparable;
+import org.openntf.domdisc.tools.DateUtil;
+import org.openntf.domdisc.tools.UserSessionTools;
 
 import android.app.Activity;
 import android.content.Context;
@@ -42,10 +46,13 @@ public final static int create_menu_id = 9874;
 	private String currentUnid = "";
 	private boolean shouldCommitToLog = false;
 	Activity myActivity = null;
+	String sortPreference = "";
 
 
 	private TextView subjectView;
 	private TextView authorView;
+	private TextView modifiedView;
+//	private TextView modifiedThreadView;
 	private WebView webView;
 	private ListView responseView;
 	private Button toggleBodyResponsesVisible;
@@ -81,6 +88,7 @@ public final static int create_menu_id = 9874;
         myActivity = getActivity();
 		shouldCommitToLog = getLogALot(myActivity);
         DatabaseManager.init(myActivity);
+        sortPreference = UserSessionTools.getSortPreference(getActivity());
 
         Bundle args = getArguments();
         if (args != null) {
@@ -102,6 +110,8 @@ public final static int create_menu_id = 9874;
 		if (currentDiscussionEntry == null)  {
 			ApplicationLog.w(getClass().getSimpleName() +  " onStart: No discussionEntry to show");
 		} else {
+			//In onStart to be able to do re-drawing when we return from sub-documents
+			populateHeader();
 			populateFooter();
 		}
 		
@@ -116,6 +126,8 @@ public final static int create_menu_id = 9874;
 		//temp
 		subjectView = (TextView) view.findViewById(R.id.subject);
 		authorView = (TextView) view.findViewById(R.id.author);
+		modifiedView = (TextView) view.findViewById(R.id.modified_field);
+//		modifiedThreadView = (TextView) view.findViewById(R.id.modified_thread_field);
 		toggleBodyResponsesVisible = (Button) view.findViewById(R.id.toggle_body_responses);
 		toggleBodyResponsesVisible.setOnClickListener(this);
 		
@@ -253,7 +265,20 @@ public final static int create_menu_id = 9874;
 			ApplicationLog.d(getClass().getSimpleName() + " number of responses: " + responseCount, shouldCommitToLog);
 			
 			if (responseCount > 0) {
-				Collections.sort(responseEntries, new DiscussionEntryModifiedComparable());
+				
+				Comparator preferredSortMechanism = null;
+				String hottestSortString = getResources().getString(R.string.menu_sort_hottest);
+				String dateSortString = getResources().getString(R.string.menu_sort_newest);
+				if(sortPreference.contentEquals(hottestSortString) ) {
+					preferredSortMechanism = new DiscussionEntryThreadModifiedComparable();
+				} else if (sortPreference.contentEquals(dateSortString) ) {
+					preferredSortMechanism = new DiscussionEntryModifiedComparable();
+				} else {
+					preferredSortMechanism = new DiscussionEntryModifiedComparable();
+				}
+				ApplicationLog.d(getClass().getSimpleName() + " populateListview - sorting", shouldCommitToLog);
+				ApplicationLog.d(getClass().getSimpleName() + " using " + preferredSortMechanism.getClass().getSimpleName(), shouldCommitToLog);
+				Collections.sort(responseEntries, preferredSortMechanism);
 
 				List<String> titles = new ArrayList<String>();
 				for (DiscussionEntry responseEntry : responseEntries) {
@@ -319,6 +344,25 @@ public final static int create_menu_id = 9874;
 		}
 		subjectView.setText(subject);
 		authorView.setText(authorToDisplay);
+		
+		String modifiedDate = currentDiscussionEntry.getModified();
+		String threadModifiedDate = currentDiscussionEntry.getThreadLastModifiedDate();
+		String modifiedDateDisplay = "";
+		String threadModifiedDateDisplay = "";
+		if (modifiedDate == null || modifiedDate.length() < 1) {
+			modifiedDateDisplay = "Unknow";
+		} else {
+			modifiedDateDisplay = DateUtil.convertToDate(modifiedDate).toLocaleString();
+		}
+		
+		if (threadModifiedDate == null || threadModifiedDate.length()<1) {
+			threadModifiedDateDisplay = "Unknown";
+		} else {
+			threadModifiedDateDisplay = DateUtil.convertToDate(threadModifiedDate).toLocaleString();
+		}
+		
+		modifiedView.setText(modifiedDateDisplay);
+//		modifiedThreadView.setText(threadModifiedDateDisplay);
 	}
 
 

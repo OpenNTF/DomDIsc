@@ -15,6 +15,9 @@
     <string name="menu_configuration">Configuration</string>
     <string name="menu_about">About app</string>
     <string name="menu_log">Log</string>
+    <string name="menu_sort">Sort by</string>
+    <string name="menu_sort_newest">Newest</string>
+    <string name="menu_sort_hottest">Hot thread</string>
 
     <!-- DatabaseConfigurationsActivity -->
     <string name="menu_settings">Preferences</string>
