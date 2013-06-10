@@ -40,14 +40,14 @@
         android:layout_height="wrap_content"
         android:text="@string/body" 
         android:layout_marginTop="10dp"/>
+
     <EditText
         android:id="@+id/edit_body"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:maxLines="50"
-        android:scrollHorizontally="false" 
+        android:gravity="top"
         android:hint="@string/body_hint"
-        />
-
+        android:maxLines="50"
+        android:scrollHorizontally="false" />
 
 </LinearLayout>

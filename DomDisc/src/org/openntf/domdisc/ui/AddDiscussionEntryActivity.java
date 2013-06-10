@@ -6,14 +6,18 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.openntf.domdisc.R;
+import org.openntf.domdisc.controllers.DiscussionDatabaseController;
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.general.Constants;
+import org.openntf.domdisc.general.DiscussionReplicator;
 import org.openntf.domdisc.model.DiscussionDatabase;
 import org.openntf.domdisc.model.DiscussionEntry;
+import org.openntf.domdisc.tools.UserSessionTools;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
@@ -37,6 +41,8 @@ public class AddDiscussionEntryActivity extends SherlockActivity {
 	private DiscussionEntry parentDiscussionEntry;
 	private boolean shouldCommitToLog = false;
 	private String defaultCategoryString = "";
+	DiscussionDatabaseController dbController ;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,69 +50,69 @@ public class AddDiscussionEntryActivity extends SherlockActivity {
 		shouldCommitToLog = getLogALot(this);
 		ApplicationLog.d(getClass().getSimpleName() + " onCreate", shouldCommitToLog);
 		defaultCategoryString = getResources().getString(R.string.category_default);
-		
+
 		DatabaseManager.init(getApplicationContext());
-        ViewGroup contentView = (ViewGroup) getLayoutInflater().inflate(R.layout.add_discussion_entry, null);
-        editSubject = (EditText) contentView.findViewById(R.id.edit_subject);
-        editBody = (EditText) contentView.findViewById(R.id.edit_body);
-        editOptionalNewCategory = (EditText) contentView.findViewById(R.id.edit_categories);
-        editCategory = (Spinner) contentView.findViewById(R.id.choose_categories);
-        setContentView(contentView);
-        setupDiscussionDatabaseAndParent();
-        
-        Set<String> databaseCategoriesSet =  discussionDatabase.getCategories();
-        
-        List<String> list = new ArrayList<String>();
-        list.add(defaultCategoryString);
-        list.addAll(databaseCategoriesSet);
-        
-        ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, list);
-        editCategory.setAdapter(dataAdapter2);
-        
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        String title = "";
-        if (parentDiscussionEntry != null) {
-        	title = "New response to " + parentDiscussionEntry.getSubject();
-        	editOptionalNewCategory.setVisibility(View.GONE);
-        	editCategory.setVisibility(View.GONE);
-        	contentView.findViewById(R.id.headline_categories).setVisibility(View.GONE);
-        } else {
-        	title = "New discussion thread";
-        }
-        getSupportActionBar().setTitle(title);
-//        setupDiscussionEntry();
+		ViewGroup contentView = (ViewGroup) getLayoutInflater().inflate(R.layout.add_discussion_entry, null);
+		editSubject = (EditText) contentView.findViewById(R.id.edit_subject);
+		editBody = (EditText) contentView.findViewById(R.id.edit_body);
+		editOptionalNewCategory = (EditText) contentView.findViewById(R.id.edit_categories);
+		editCategory = (Spinner) contentView.findViewById(R.id.choose_categories);
+		setContentView(contentView);
+		setupDiscussionDatabaseAndParent();
+
+		Set<String> databaseCategoriesSet =  discussionDatabase.getCategories();
+
+		List<String> list = new ArrayList<String>();
+		list.add(defaultCategoryString);
+		list.addAll(databaseCategoriesSet);
+
+		ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, list);
+		editCategory.setAdapter(dataAdapter2);
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		String title = "";
+		if (parentDiscussionEntry != null) {
+			title = "New response to " + parentDiscussionEntry.getSubject();
+			editOptionalNewCategory.setVisibility(View.GONE);
+			editCategory.setVisibility(View.GONE);
+			contentView.findViewById(R.id.headline_categories).setVisibility(View.GONE);
+		} else {
+			title = "New discussion thread";
+		}
+		getSupportActionBar().setTitle(title);
+		//        setupDiscussionEntry();
 	}
-	
+
 	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-       MenuInflater inflater = getSupportMenuInflater();
-       inflater.inflate(R.menu.activity_add_discussion_entry, menu);
-       return true;
-    }
-	
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.activity_add_discussion_entry, menu);
+		return true;
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	   switch (item.getItemId()) {
-	      case android.R.id.home:
-//	    	  NavUtils.navigateUpFromSameTask(this);
-	    	  finish(); // stops  this Activity
-	         return true;
-	      case R.id.menu_save:
-	    	  
-	    	  String subject = editSubject.getText().toString();
-	    	  String body = editBody.getText().toString();
-	    	  String optionalCategory = editOptionalNewCategory.getText().toString();
-	    	  String category = (String) editCategory.getSelectedItem();
-	    	  
-	    	  createNewDiscussionEntry(subject, body, category, optionalCategory);
-	    	  finish(); // stops  this Activity
-	    	  return true;
-	   }
-	   return super.onOptionsItemSelected(item);
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			//	    	  NavUtils.navigateUpFromSameTask(this);
+			finish(); // stops  this Activity
+			return true;
+		case R.id.menu_save:
+
+			String subject = editSubject.getText().toString();
+			String body = editBody.getText().toString();
+			String optionalCategory = editOptionalNewCategory.getText().toString();
+			String category = (String) editCategory.getSelectedItem();
+
+			createNewDiscussionEntry(subject, body, category, optionalCategory);
+			finish(); // stops  this Activity
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}	
-	
-	
-	
+
+
+
 
 
 	private void setupDiscussionDatabaseAndParent() {
@@ -120,6 +126,7 @@ public class AddDiscussionEntryActivity extends SherlockActivity {
 				String discussionEntryId = bundle.getString(Constants.keyDiscussionEntryId);
 				parentDiscussionEntry = DatabaseManager.getInstance().getDiscussionEntryWithId(discussionEntryId);
 			}
+			dbController = new DiscussionDatabaseController(discussionDatabase, getApplicationContext());
 		}	
 	}
 
@@ -143,7 +150,7 @@ public class AddDiscussionEntryActivity extends SherlockActivity {
 				ApplicationLog.d(getClass().getSimpleName() + " A Response with parent id: " + discussionEntry.getParentid(), shouldCommitToLog);
 			} else {
 				discussionEntry.setForm("MainTopic");
-				
+
 				if (optionalCategory != null && optionalCategory.length()>0) {
 					discussionEntry.setCategories(optionalCategory);
 					ApplicationLog.d(getClass().getSimpleName() + " Category: " + optionalCategory, shouldCommitToLog);
@@ -151,18 +158,17 @@ public class AddDiscussionEntryActivity extends SherlockActivity {
 					discussionEntry.setCategories(category);	
 					ApplicationLog.d(getClass().getSimpleName() + " Category: " + category, shouldCommitToLog);
 				}
-				
+
 				ApplicationLog.d(getClass().getSimpleName() + " A Main Document", shouldCommitToLog);
 			}
-			
-			
-			DatabaseManager.getInstance().createDiscussionEntry(discussionEntry);
-			
+
+			dbController.handleMessage(DiscussionDatabaseController.MESSAGE_ADD_DISCUSSIONENTRYANDREPLICATE, discussionEntry);
+
 		} else {
 			ApplicationLog.w(getClass().getSimpleName() + " No discussionDatabase available for saving the entry");
 		}
 	}
-	
+
 	private static boolean getLogALot(Context ctxt) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
 		return prefs.getBoolean("checkbox_preference_logalot", false);

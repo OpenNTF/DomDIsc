@@ -2,6 +2,7 @@ package org.openntf.domdisc.ui;
 
 import java.util.List;
 
+import org.openntf.domdisc.controllers.DiscussionDatabaseController;
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.general.Constants;
@@ -10,6 +11,7 @@ import org.openntf.domdisc.model.DiscussionEntry;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -43,12 +45,15 @@ public class AddDiscussionDatabaseActivity extends SherlockActivity {
 	private String password = "";
 	private boolean useSSL = false;
 	private String httpPort = "";
+	private DiscussionDatabaseController dbController ;
+	private Context context;
 	
 	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		context = getApplicationContext();
         ViewGroup contentView = (ViewGroup) getLayoutInflater().inflate(R.layout.add_discussion_database, null);
         edit = (EditText) contentView.findViewById(R.id.edit);
         hostNameEdit = (EditText) contentView.findViewById(R.id.hostName);
@@ -197,6 +202,8 @@ public class AddDiscussionDatabaseActivity extends SherlockActivity {
 			discussionDatabase.setUserName(userName);
 			discussionDatabase.setUseSSL(useSSL);
 			DatabaseManager.getInstance().updateDiscussionDatabase(discussionDatabase);
+	        dbController = new DiscussionDatabaseController(discussionDatabase, context);
+	        dbController.handleMessage(DiscussionDatabaseController.MESSAGE_REPLICATE, discussionDatabase);
 		}
 	}
 
@@ -210,6 +217,8 @@ public class AddDiscussionDatabaseActivity extends SherlockActivity {
 		db.setUserName(userName);
 		db.setUseSSL(useSSL);
 		DatabaseManager.getInstance().addDiscussionDatabase(db);
+        dbController = new DiscussionDatabaseController(db, context);
+        dbController.handleMessage(DiscussionDatabaseController.MESSAGE_REPLICATE, db);
 	}
 	
 	private void deleteDiscussionDatabase() {

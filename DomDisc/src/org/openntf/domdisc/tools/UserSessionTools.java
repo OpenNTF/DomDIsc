@@ -2,6 +2,9 @@ package org.openntf.domdisc.tools;
 
 import org.openntf.domdisc.R;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.model.DiscussionDatabase;
@@ -33,6 +36,25 @@ public class UserSessionTools {
 			return true;
 		}
 		return true;
+	}
+	
+	public static double getBatteryLevel(double batteryLevel, Context context) {
+		//Battery: http://stackoverflow.com/questions/3661464/get-battery-level-before-broadcast-receiver-responds-for-intent-action-battery-c
+		Intent batteryIntent = context.registerReceiver(null,
+				new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+		int rawlevel = batteryIntent.getIntExtra("level", -1);
+		double scale = batteryIntent.getIntExtra("scale", -1);
+//		ApplicationLog.d("battery rawLevel: " + rawlevel, shouldLogALot);
+//		ApplicationLog.d("battery scale: " + scale, shouldLogALot);
+		
+		if (rawlevel == 0) {
+			ApplicationLog.i("battery rawLevel: " + rawlevel + " looks wrong. Assuming 50. Will not be able to properly measure battery level on this device.");
+			rawlevel = 50;
+		}
+		if (rawlevel >= 0 && scale > 0) {
+			batteryLevel = rawlevel / scale;
+		}
+		return batteryLevel;
 	}
 	
 	
@@ -97,6 +119,16 @@ public class UserSessionTools {
 		return sortPreference;
 
 	}
-	
+
+	/**
+	 * 
+	 * @param ctxt
+	 * @return boolean true if we should log all debuglevels to the
+	 *         ApplicationLog
+	 */
+	public static boolean getLogALot(Context ctxt) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
+		return prefs.getBoolean("checkbox_preference_logalot", false);
+	}
 
 }

@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.model.DiscussionDatabase;
+import org.openntf.domdisc.tools.UserSessionTools;
 
 import android.content.Context;
 import android.content.Intent;
@@ -53,7 +54,7 @@ public class ScheduledService extends WakefulIntentService {
 		try {
 			double batteryLevel = -1;
 
-			batteryLevel = getBatteryLevel(batteryLevel);
+			batteryLevel = UserSessionTools.getBatteryLevel(batteryLevel, getApplicationContext());
 			ApplicationLog.d("Current battery level: " + batteryLevel, shouldLogALot);
 			if (batteryLevel < 0.2) {
 								ApplicationLog.i("background replication is disabled because of low battery - " + batteryLevel + " (below 20%)");
@@ -94,24 +95,24 @@ public class ScheduledService extends WakefulIntentService {
 	}
 
 
-	private double getBatteryLevel(double batteryLevel) {
-		//Battery: http://stackoverflow.com/questions/3661464/get-battery-level-before-broadcast-receiver-responds-for-intent-action-battery-c
-		Intent batteryIntent = this.getApplicationContext().registerReceiver(null,
-				new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-		int rawlevel = batteryIntent.getIntExtra("level", -1);
-		double scale = batteryIntent.getIntExtra("scale", -1);
-		ApplicationLog.d("battery rawLevel: " + rawlevel, shouldLogALot);
-		ApplicationLog.d("battery scale: " + scale, shouldLogALot);
-		
-		if (rawlevel == 0) {
-			ApplicationLog.i("battery rawLevel: " + rawlevel + " looks wrong. Assuming 50. Will not be able to properly measure battery level on this device.");
-			rawlevel = 50;
-		}
-		if (rawlevel >= 0 && scale > 0) {
-			batteryLevel = rawlevel / scale;
-		}
-		return batteryLevel;
-	}
+//	private double getBatteryLevel(double batteryLevel) {
+//		//Battery: http://stackoverflow.com/questions/3661464/get-battery-level-before-broadcast-receiver-responds-for-intent-action-battery-c
+//		Intent batteryIntent = this.getApplicationContext().registerReceiver(null,
+//				new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+//		int rawlevel = batteryIntent.getIntExtra("level", -1);
+//		double scale = batteryIntent.getIntExtra("scale", -1);
+//		ApplicationLog.d("battery rawLevel: " + rawlevel, shouldLogALot);
+//		ApplicationLog.d("battery scale: " + scale, shouldLogALot);
+//		
+//		if (rawlevel == 0) {
+//			ApplicationLog.i("battery rawLevel: " + rawlevel + " looks wrong. Assuming 50. Will not be able to properly measure battery level on this device.");
+//			rawlevel = 50;
+//		}
+//		if (rawlevel >= 0 && scale > 0) {
+//			batteryLevel = rawlevel / scale;
+//		}
+//		return batteryLevel;
+//	}
 
 	private void setLastReplication(GregorianCalendar replicationTime, Context ctxt) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
