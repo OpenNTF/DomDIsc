@@ -43,16 +43,10 @@ public class DatabaseConfigurationsActivity extends SherlockActivity {
 
 		DatabaseManager.init(this);
 		shouldCommitToLog = getLogALot(this);
-		//        ApplicationLog.w("dims med warning fra main");
 
-		//        PollReceiver.scheduleAlarms(this);
-		//        Toast.makeText(this, R.string.alarms_scheduled, Toast.LENGTH_LONG)
-		//        .show();
 		ViewGroup contentView = (ViewGroup) getLayoutInflater().inflate(R.layout.main, null);
 		listView = (ListView) contentView.findViewById(R.id.list_view);
 
-		//        Button btn = (Button) contentView.findViewById(R.id.button_add);
-		//        setupButton(btn);
 		setContentView(contentView);
 		
 		helpLayout = findViewById(R.id.top_layout);
@@ -69,11 +63,6 @@ public class DatabaseConfigurationsActivity extends SherlockActivity {
 			});
 		}
 		
-//		helpLayout = findViewById(R.id.top_layout);
-//		if (isNotFirstTimeSeeingConfigurationActivity()) {
-//			ApplicationLog.d("Has seen hint before - hiding it", shouldCommitToLog);
-//			helpLayout.setVisibility(View.INVISIBLE);
-//		}
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		
@@ -95,11 +84,6 @@ public class DatabaseConfigurationsActivity extends SherlockActivity {
 		PollReceiver.scheduleAlarms(this);
 	}
 
-	//    @Override
-	//    public boolean onCreateOptionsMenu(Menu menu) {
-	//        getMenuInflater().inflate(R.menu.activity_main, menu);
-	//        return true;
-	//    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -130,16 +114,6 @@ public class DatabaseConfigurationsActivity extends SherlockActivity {
 			intent = new Intent(activity, PreferenceActivity.class);
 			startActivity (intent);
 			return true;
-			//Åbn generel konfiguration
-			//            case R.id.menu_about:
-			//            	//start Action
-			//            	return true;
-
-			//            case R.id.menu_log:
-			//            	//Åbne log Activity
-			//            	intent = new Intent(activity, LogListActivity.class);
-			//				startActivity(intent);
-			//            	return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -176,31 +150,6 @@ public class DatabaseConfigurationsActivity extends SherlockActivity {
 		return prefs.getBoolean("checkbox_preference_logalot", false);
 	}
 	
-	// Sample code:
-	// http://www.christianpeeters.com/android-tutorials/android-tutorial-overlay-with-user-instructions/
-	private boolean isNotFirstTimeSeeingConfigurationActivity() {
-		SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-//		boolean hasSeenConfigurationBefore = preferences.getBoolean("hasSeenConfigurationBefore", false);
-		boolean hasSeenConfigurationBefore = false;
-		if (!hasSeenConfigurationBefore) {
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putBoolean("hasSeenConfigurationBefore", true);
-			editor.commit();
-			helpLayout.setVisibility(View.VISIBLE);
-			helpLayout.setOnTouchListener(new View.OnTouchListener() {
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					helpLayout.setVisibility(View.INVISIBLE);
-					return false;
-				}
-
-			});
-
-		}
-		return hasSeenConfigurationBefore;
-
-	}
-	
 	private boolean hasNoConfiguration() {
 		List<DiscussionDatabase> discussionDatabases = DatabaseManager.getInstance().getAllDiscussionDatabases();
 		if (discussionDatabases == null || discussionDatabases.size()<1) {
@@ -209,15 +158,4 @@ public class DatabaseConfigurationsActivity extends SherlockActivity {
 			return false;
 		}	
 	}
-
-	//    private void setupButton(Button btn) {
-	//    	final Activity activity = this;
-	//    	btn.setOnClickListener(new OnClickListener() {
-	//			public void onClick(View v) {
-	//				Intent intent = new Intent(activity,AddDiscussionDatabaseActivity.class);
-	//				startActivity (intent);
-	//			}
-	//		});
-	//    }
-
 }
