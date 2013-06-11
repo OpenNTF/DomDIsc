@@ -38,6 +38,7 @@ public class AddDiscussionDatabaseActivity extends SherlockActivity {
 	private EditText passwordEdit;
 	private CheckBox useSSLEdit;
 	private EditText httpPortEdit;
+	private CheckBox disableComputeWithFormEdit;
 	
 	private String hostName = "";
 	private String dbPath = "";
@@ -45,6 +46,7 @@ public class AddDiscussionDatabaseActivity extends SherlockActivity {
 	private String password = "";
 	private boolean useSSL = false;
 	private String httpPort = "";
+	private boolean disableComputeWithForm = false;
 	private DiscussionDatabaseController dbController ;
 	private Context context;
 	
@@ -62,6 +64,7 @@ public class AddDiscussionDatabaseActivity extends SherlockActivity {
         passwordEdit = (EditText) contentView.findViewById(R.id.password);
         useSSLEdit = (CheckBox) contentView.findViewById(R.id.useSSL);
         httpPortEdit = (EditText) contentView.findViewById(R.id.httpPort);
+        disableComputeWithFormEdit = (CheckBox) contentView.findViewById(R.id.disableComputeWithForm);
 //        Button btn = (Button) contentView.findViewById(R.id.button_save);
 //        setupButton(btn);
         
@@ -117,6 +120,7 @@ public class AddDiscussionDatabaseActivity extends SherlockActivity {
         				password = passwordEdit.getText().toString();
         				useSSL = useSSLEdit.isChecked();
         				httpPort = httpPortEdit.getText().toString();
+        				disableComputeWithForm = disableComputeWithFormEdit.isChecked();
         				
         				if (null!=name && name.length()>0) {
         					if (null!=discussionDatabase) {
@@ -216,6 +220,7 @@ public class AddDiscussionDatabaseActivity extends SherlockActivity {
 		db.setPassword(password);
 		db.setUserName(userName);
 		db.setUseSSL(useSSL);
+		db.setDisableComputeWithForm(disableComputeWithForm);
 		DatabaseManager.getInstance().addDiscussionDatabase(db);
         dbController = new DiscussionDatabaseController(db, context);
         dbController.handleMessage(DiscussionDatabaseController.MESSAGE_REPLICATE, db);

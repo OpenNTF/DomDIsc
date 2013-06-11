@@ -63,7 +63,7 @@ public class DiscussionReplicator {
 	/**
 	 * Activate to replicate one Discussion database
 	 */
-	public void replicateDiscussionDatabase(DiscussionDatabase discussionDatabase) {
+	public synchronized void replicateDiscussionDatabase(DiscussionDatabase discussionDatabase) {
 		String authenticationCookie = "";
 		DatabaseManager.init(context);
 		ApplicationLog.i("Replicate " + discussionDatabase.getName());
@@ -84,6 +84,9 @@ public class DiscussionReplicator {
 			} else {
 				httpType = "http";
 			}
+			
+			boolean disableComputeWithForm = discussionDatabase.isDisableComputeWithForm();
+			
 			String urlForDocuments = httpType + "://" + hostName;
 
 			if (httpPort.contentEquals("80") || httpPort.contentEquals("")) {
@@ -105,7 +108,7 @@ public class DiscussionReplicator {
 				ApplicationLog
 				.w("Unable to start replication as Authentication with the server was not established. Stopping.");
 			} else {
-				replicateLocalDatabaseToServer(discussionDatabase, hostName,urlForDocuments, authenticationCookie);
+				replicateLocalDatabaseToServer(discussionDatabase, hostName,urlForDocuments, authenticationCookie, disableComputeWithForm);
 				// Any entries submitted will be deleted when the replicateServerToLocalDatabase runs (because the locally created entries' unids are not found in the downloaded entries)
 				if (replicateServerToLocalDatabase(discussionDatabase, hostName,urlForDocuments, authenticationCookie)) {
 					ApplicationLog.d(getClass().getSimpleName() + " Replication OK", shouldCommitToLog);
@@ -126,7 +129,7 @@ public class DiscussionReplicator {
 	 * @return True if replication went as expected
 	 */
 	private boolean replicateLocalDatabaseToServer(DiscussionDatabase discussionDatabase, String hostName,
-			String urlForDocuments, String authenticationCookie) {
+			String urlForDocuments, String authenticationCookie, boolean disableComputeWithForm) {
 
 		ApplicationLog.d(getClass().getSimpleName() + " start", shouldCommitToLog);
 
@@ -136,23 +139,28 @@ public class DiscussionReplicator {
 		int failedUploadCount = 0;
 
 		ArrayList<DiscussionEntry> discussionEntriesForSubmitting = (ArrayList<DiscussionEntry>) DatabaseManager.getInstance().getDiscussionEntriesForSubmit(discussionDatabase);
-		ApplicationLog.d(getClass().getSimpleName() + " Found " + discussionEntriesForSubmitting.size() + " entries for submitting to the server", shouldCommitToLog);
-		Iterator<DiscussionEntry> discussionEntriesForSubmittingIterator = discussionEntriesForSubmitting.iterator();
-		while (discussionEntriesForSubmittingIterator.hasNext()) {
-			DiscussionEntry currentEntry = discussionEntriesForSubmittingIterator.next();
-			ApplicationLog.d(getClass().getSimpleName() + " Will submit " + currentEntry.getSubject(), shouldCommitToLog);
-			String submittedLocation = submitDiscussionEntry(currentEntry, urlForDocuments, authenticationCookie);
-			if (submittedLocation.length()> 0) {
-				succesfulUploadCount++;	
-				ApplicationLog.d(getClass().getSimpleName() + " successfully submitted to " + submittedLocation, shouldCommitToLog);
-			} else {
-				failedUploadCount++;
-				ApplicationLog.d(getClass().getSimpleName() + " submit failed", shouldCommitToLog);
+		if (discussionEntriesForSubmitting == null ) {
+			ApplicationLog.d(getClass().getSimpleName() + " Found no entries for submitting to the server", shouldCommitToLog);			
+		} else {
+			ApplicationLog.d(getClass().getSimpleName() + " Found " + discussionEntriesForSubmitting.size() + " entries for submitting to the server", shouldCommitToLog);
+			Iterator<DiscussionEntry> discussionEntriesForSubmittingIterator = discussionEntriesForSubmitting.iterator();
+			while (discussionEntriesForSubmittingIterator.hasNext()) {
+				DiscussionEntry currentEntry = discussionEntriesForSubmittingIterator.next();
+				ApplicationLog.d(getClass().getSimpleName() + " Will submit " + currentEntry.getSubject(), shouldCommitToLog);
+				String submittedLocation = submitDiscussionEntry(currentEntry, urlForDocuments, authenticationCookie, disableComputeWithForm);
+				if (submittedLocation.length()> 0) {
+					succesfulUploadCount++;	
+					ApplicationLog.d(getClass().getSimpleName() + " successfully submitted to " + submittedLocation, shouldCommitToLog);
+				} else {
+					failedUploadCount++;
+					ApplicationLog.d(getClass().getSimpleName() + " submit failed", shouldCommitToLog);
+				}
 			}
-		}
 
-		ApplicationLog.d(getClass().getSimpleName() + " total succesful submits to " + discussionDatabase.getName() + ": " + succesfulUploadCount , shouldCommitToLog);
-		ApplicationLog.d(getClass().getSimpleName() + " total failed submits to " + discussionDatabase.getName() + ": " + failedUploadCount , shouldCommitToLog);
+			ApplicationLog.d(getClass().getSimpleName() + " total succesful submits to " + discussionDatabase.getName() + ": " + succesfulUploadCount , shouldCommitToLog);
+			ApplicationLog.d(getClass().getSimpleName() + " total failed submits to " + discussionDatabase.getName() + ": " + failedUploadCount , shouldCommitToLog);
+
+		}
 
 		return (succesfulUploadCount > 0);
 
@@ -164,7 +172,7 @@ public class DiscussionReplicator {
 	 * @param authenticationCookie
 	 * @return http location of the newly created DiscussionEntry. Empty String if unsuccesful.  
 	 */
-	private String submitDiscussionEntry(DiscussionEntry discussionEntry, String urlForDocuments,	String authenticationCookie) {
+	private String submitDiscussionEntry(DiscussionEntry discussionEntry, String urlForDocuments,	String authenticationCookie, boolean disableComputeWithForm) {
 		String returnString = "";
 
 		//Using a simple class to hold what gets submitted - keeps things simpler
@@ -179,7 +187,18 @@ public class DiscussionReplicator {
 			formForSubmit = "MainTopic";
 		}
 
-		String url = urlForDocuments + "?form=" + formForSubmit + "&computewithform=true";
+		String url = urlForDocuments + "?form=" + formForSubmit + "&computewithform=";
+		//String url = urlForDocuments + "?form=" + formForSubmit + "&computewithform=true";
+		
+		//Having computewithform=true will let the application logic compute extra fields on the submitted documents
+		//Disabling computewithform may make it possible to get the app working with discussion databases that have more logic than the standard 
+		// Discussion template
+		if (disableComputeWithForm) {
+			url = url + "false";
+		} else {
+			url = url + "true";
+		}
+		
 
 		if (parentid != null && parentid.length() > 0) {
 			url = url + "&parentid=" + parentid;
@@ -198,11 +217,11 @@ public class DiscussionReplicator {
 
 		HttpEntity<DiscussionEntryForSubmitting> requestEntity = new HttpEntity<DiscussionEntryForSubmitting>(entryToSubmit,requestHeaders);
 
-		ApplicationLog.d(getClass().getSimpleName() + " Adding MappingJackson2HttpMessageConverter AND StringHttpMessageConverter to restTemplate", shouldCommitToLog);
+		//		ApplicationLog.d(getClass().getSimpleName() + " Adding MappingJackson2HttpMessageConverter AND StringHttpMessageConverter to restTemplate", shouldCommitToLog);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 		restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
 
-		ApplicationLog.d(getClass().getSimpleName() + "POST to " + url, shouldCommitToLog);
+		ApplicationLog.d(getClass().getSimpleName() + " POST to " + url, shouldCommitToLog);
 		ResponseEntity<String> httpResponse;
 		try {
 			httpResponse = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
@@ -292,7 +311,7 @@ public class DiscussionReplicator {
 					JSONArray jsonArray = new JSONArray(jsonString);
 
 					ApplicationLog.d(
-							"Number of entries downloaded" + jsonArray.length(), shouldCommitToLog);
+							"Number of entries downloaded: " + jsonArray.length(), shouldCommitToLog);
 
 					if (jsonArray.length() > 0) {
 						/**
@@ -309,7 +328,7 @@ public class DiscussionReplicator {
 
 				} catch (Exception e) {
 					replicationOK = false;
-					ApplicationLog.e("Exception" + e.getMessage());
+					ApplicationLog.e(getClass().getSimpleName() + " Exception" + e.getMessage());
 				}
 
 			} else {
@@ -324,7 +343,7 @@ public class DiscussionReplicator {
 			if (errorMessage == null) {
 				errorMessage = "Error message not available";
 			}
-			ApplicationLog.e("Exception: " + errorMessage);
+			ApplicationLog.e(getClass().getSimpleName() + " Exception: " + errorMessage);
 
 			if (errorMessage.contains("403")) {
 				ApplicationLog.i("403 - Looks like the Domino Data Service is not enabled for the database " + discussionDatabase.getDbPath());
@@ -352,7 +371,7 @@ public class DiscussionReplicator {
 			if (message == null) {
 				message = "Exception with no message";
 			}
-			ApplicationLog.e(message);
+			ApplicationLog.e(getClass().getSimpleName() + " " + message);
 			e2.printStackTrace();
 		}
 		return replicationOK;
@@ -408,7 +427,7 @@ public class DiscussionReplicator {
 					//					serverDiscussionEntryList.add(discussionEntry);  // Should be removed 
 					serverDiscussionEntryMap.put(unid, discussionEntry);
 				} catch (JSONException e) {
-					ApplicationLog.e("Error while accessing JSON object values");
+					ApplicationLog.e(getClass().getSimpleName() + " Error while accessing JSON object values");
 					e.printStackTrace();
 				}
 			} catch (JSONException e) {
@@ -474,25 +493,33 @@ public class DiscussionReplicator {
 			 * Checking all locally stored entries - are they in the download
 			 * if not - delete the local entry
 			 */
+			ApplicationLog.d("Checking all database entries: should they be deleted?", shouldCommitToLog);
 			ArrayList<DiscussionEntry> localDiscussionEntryList = new ArrayList<DiscussionEntry>();
-			localDiscussionEntryList = (ArrayList<DiscussionEntry>) discussionDatabase.getDiscussionEntries();
-			ApplicationLog.d("Checking all database entries: should they be deleted? - not yet implemented", shouldCommitToLog);
-			//Example on using Map http://www.java-tips.org/java-se-tips/java.util/how-to-use-of-hashmap.html
-			//
-			Iterator<DiscussionEntry> localDiscussionEntryListIterator = localDiscussionEntryList.iterator();
-			while (localDiscussionEntryListIterator.hasNext()) {
-				DiscussionEntry currentEntry = localDiscussionEntryListIterator.next();
-				String unid = currentEntry.getUnid();
-				// Check if the was downloaded 
-				ApplicationLog.d("Lookup for unid: " + unid, shouldCommitToLog);
-				DiscussionEntry serverEntry = serverDiscussionEntryMap.get(unid);
-				if (serverEntry != null) {
-					ApplicationLog.d("Found the entry " + currentEntry.getSubject() + " in the downloaded list", shouldCommitToLog);
-				} else {
-					ApplicationLog.d("Did not find the entry " + currentEntry.getSubject() + " in the downloaded list. Deleting in local DB", shouldCommitToLog);
-					DatabaseManager.getInstance().deleteDiscussionEntry(currentEntry);
-				}
+			try {
+				localDiscussionEntryList = (ArrayList<DiscussionEntry>) discussionDatabase.getDiscussionEntries();
+			} catch (Exception e) {
+				//This throws exception if the database has just done its first server-to-local replication
+				ApplicationLog.w("Unable to retrieve local discussion entries. This is OK if it is the first replication of this database: " + discussionDatabase.getName());
+			}
+			
+			if (localDiscussionEntryList.size()>0) {
+				//Example on using Map http://www.java-tips.org/java-se-tips/java.util/how-to-use-of-hashmap.html
+				//
+				Iterator<DiscussionEntry> localDiscussionEntryListIterator = localDiscussionEntryList.iterator();
+				while (localDiscussionEntryListIterator.hasNext()) {
+					DiscussionEntry currentEntry = localDiscussionEntryListIterator.next();
+					String unid = currentEntry.getUnid();
+					// Check if the was downloaded 
+					ApplicationLog.d("Lookup for unid: " + unid, shouldCommitToLog);
+					DiscussionEntry serverEntry = serverDiscussionEntryMap.get(unid);
+					if (serverEntry != null) {
+						ApplicationLog.d("Found the entry " + currentEntry.getSubject() + " in the downloaded list", shouldCommitToLog);
+					} else {
+						ApplicationLog.d("Did not find the entry " + currentEntry.getSubject() + " in the downloaded list. Deleting in local DB", shouldCommitToLog);
+						DatabaseManager.getInstance().deleteDiscussionEntry(currentEntry);
+					}
 
+				}
 			}
 		}
 		/**
@@ -593,7 +620,7 @@ public class DiscussionReplicator {
 						.i("No Document retrieved. Nothing to do");
 					}
 				} catch (Exception e) {
-					ApplicationLog.e("Exception: " + e.getMessage());
+					ApplicationLog.e(getClass().getSimpleName() + " Exception: " + e.getMessage());
 				}
 
 			} else {
@@ -703,7 +730,7 @@ public class DiscussionReplicator {
 			try {
 				returnValue = jsonDocument.getString(fieldName);
 			} catch (JSONException e) {
-				ApplicationLog.d("Unable to find field " + fieldName, shouldCommitToLog);
+				//				ApplicationLog.d("Unable to find field " + fieldName, shouldCommitToLog);
 				returnValue = "";
 			}
 
@@ -909,7 +936,7 @@ public class DiscussionReplicator {
 
 		return authenticationCookie;
 	}
-	
+
 	private void updateParentThreadDates(DiscussionEntry discussionEntry) {
 		ApplicationLog.d(getClass().getSimpleName() + " updateParentThreadDates for " + discussionEntry.getSubject(), shouldCommitToLog);
 		String parentId =discussionEntry.getParentid();

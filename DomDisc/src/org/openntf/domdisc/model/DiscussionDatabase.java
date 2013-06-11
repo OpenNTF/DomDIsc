@@ -39,8 +39,12 @@ public class DiscussionDatabase {
 	private boolean useSSL;
 	
 	@DatabaseField
-	private String httpPort;	
+	private String httpPort;
 	
+	@DatabaseField
+	private boolean disableComputeWithForm;
+	
+
 
 	public void setId(int id) {
 		this.id = id;
@@ -145,5 +149,14 @@ public class DiscussionDatabase {
 
 	public void setHttpPort(String httpPort) {
 		this.httpPort = httpPort;
+	}
+	
+
+	public boolean isDisableComputeWithForm() {
+		return disableComputeWithForm;
+	}
+
+	public void setDisableComputeWithForm(boolean disableComputeWithForm) {
+		this.disableComputeWithForm = disableComputeWithForm;
 	}
 }
