@@ -40,39 +40,41 @@ public class LogListActivity extends SherlockActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+		DatabaseManager.init(getApplicationContext());
 		setupListView();
 		setTitle("Log list");
 	}
-	
+
 	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-       MenuInflater inflater = getSupportMenuInflater();
-       inflater.inflate(R.menu.activity_log_list, menu);
-       return true;
-    }
-	
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.activity_log_list, menu);
+		return true;
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	   switch (item.getItemId()) {
-	      case android.R.id.home:
-//	         NavUtils.navigateUpTo(this, new Intent(this, DiscussionEntriesViewActivity.class));
-	    	  NavUtils.navigateUpTo(this, new Intent(this, org.openntf.domdisc.ui.StartActivity.class));
-	         return true;
-	      case R.id.menu_empty_log:
-	    	  //Empty
-	    	  DatabaseManager.getInstance().emptyAppLog();
-	    	  setupListView();
-	    	  return true;
-	      case R.id.menu_refresh_log:
-	    	  //refresh
-	    	  setupListView();
-	    	  return true;
-	   }
-	   return super.onOptionsItemSelected(item);
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			//	         NavUtils.navigateUpTo(this, new Intent(this, DiscussionEntriesViewActivity.class));
+			NavUtils.navigateUpTo(this, new Intent(this, org.openntf.domdisc.ui.StartActivity.class));
+			return true;
+		case R.id.menu_empty_log:
+			//Empty
+			DatabaseManager.getInstance().emptyAppLog();
+			setupListView();
+			return true;
+		case R.id.menu_refresh_log:
+			//refresh
+			setupListView();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void setupListView() {
 		final List<AppLog> logEntries = DatabaseManager.getInstance().getAllAppLogs();
+
 		List<String> titles = new ArrayList<String>();
 		for (AppLog logEntry : logEntries) {
 			titles.add(logEntry.getLogTime() + " " + logEntry.getMessage());
@@ -80,18 +82,7 @@ public class LogListActivity extends SherlockActivity {
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, titles);
 		listView.setAdapter(adapter);
 		listView.setSelection(logEntries.size());
-		//			final Activity activity = this;
-		//			listView.setOnItemClickListener(new OnItemClickListener() {
-		//				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		//					DiscussionEntry item = discussionEntries.get(position);
-		//					Intent intent = new Intent(activity,ReadDiscussionEntryActivity.class);
-		//					intent.putExtra(Constants.keyDiscussionEntryId, item.getUnid());
-		//					startActivity(intent);
-		//				}
-		//			});
+
 	}
-
-
-
 
 }

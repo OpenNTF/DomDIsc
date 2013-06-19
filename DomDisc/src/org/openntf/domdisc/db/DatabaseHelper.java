@@ -20,9 +20,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	// appropriate for your app
 	private static final String DATABASE_NAME = "DiscDB.sqlite";
 
-	// any time you make changes to your database objects, you may have to
-	// increase the database version
-	private static final int DATABASE_VERSION = 16;
+	// any time you make changes to your database objects, increase database_version
+	private static final int DATABASE_VERSION = 16; 
+	// When increasing database_version, increase each of the version numbers below (to the value of database_version) 
+	// IF the model and thus table has been altered 
+	private static final int CURRENT_DATABASE_VERSION_DISCUSSIONDATABASE = 16; //OnUpgrade will check if oldVersion < this value and upgrade if yes 
+	private static final int CURRENT_DATABASE_VERSION_DISCUSSIONENTRY = 16; //OnUpgrade will check if oldVersion < this value and upgrade if yes
+	private static final int CURRENT_DATABASE_VERSION_APPLOG = 16; //OnUpgrade will check if oldVersion < this value and upgrade if yes
 
 	// the DAO object we use to access the SimpleData table
 	private Dao<DiscussionDatabase, Integer> discussionDatabaseDao = null;
@@ -33,6 +37,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
+
 
 	@Override
 	public void onCreate(SQLiteDatabase database,
@@ -65,15 +70,38 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			// for (String sql : allSql) {
 			// db.execSQL(sql);
 			// }
-			Log.i(DatabaseHelper.class.getName(),
-					"Dropping all database tables and recreating");
-			TableUtils.dropTable(connectionSource, DiscussionDatabase.class,
-					true);
-			TableUtils.dropTable(connectionSource, DiscussionEntry.class, true);
-			TableUtils.dropTable(connectionSource, AppLog.class, true);
-			TableUtils.createTable(connectionSource, DiscussionDatabase.class);
-			TableUtils.createTable(connectionSource, DiscussionEntry.class);
-			TableUtils.createTable(connectionSource, AppLog.class);
+			
+			if (oldVersion<CURRENT_DATABASE_VERSION_DISCUSSIONDATABASE) {
+				Log.i(DatabaseHelper.class.getName(),
+						"Dropping tables and recreating for " + "Discussion Database configuration");
+				TableUtils.dropTable(connectionSource, DiscussionDatabase.class,
+						true);
+				TableUtils.createTable(connectionSource, DiscussionDatabase.class);			}
+			
+			if (oldVersion<CURRENT_DATABASE_VERSION_DISCUSSIONENTRY) {
+				Log.i(DatabaseHelper.class.getName(),
+						"Dropping tables and recreating for " + "Discussion Entries");
+				TableUtils.dropTable(connectionSource, DiscussionEntry.class, true);
+				TableUtils.createTable(connectionSource, DiscussionEntry.class);
+			}
+			
+			if (oldVersion<CURRENT_DATABASE_VERSION_APPLOG) {
+				Log.i(DatabaseHelper.class.getName(),
+						"Dropping tables and recreating for " + "Application log");
+				TableUtils.dropTable(connectionSource, AppLog.class, true);
+				TableUtils.createTable(connectionSource, AppLog.class);
+			}
+			
+//			
+//			Log.i(DatabaseHelper.class.getName(),
+//					"Dropping all database tables and recreating");
+//			TableUtils.dropTable(connectionSource, DiscussionDatabase.class,
+//					true);
+//			TableUtils.dropTable(connectionSource, DiscussionEntry.class, true);
+//			TableUtils.dropTable(connectionSource, AppLog.class, true);
+//			TableUtils.createTable(connectionSource, DiscussionDatabase.class);
+//			TableUtils.createTable(connectionSource, DiscussionEntry.class);
+//			TableUtils.createTable(connectionSource, AppLog.class);
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "exception during onUpgrade",
 					e);
@@ -95,16 +123,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		return discussionDatabaseDao;
 	}
 
-	// public Dao<DiscussionEntry, Integer> getDiscussionEntryDao() {
-	// if (null == discussionEntryDao) {
-	// try {
-	// discussionEntryDao = getDao(DiscussionEntry.class);
-	// }catch (java.sql.SQLException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// return discussionEntryDao;
-	// }
 
 	public Dao<DiscussionEntry, String> getDiscussionEntryDao() {
 		if (null == discussionEntryDao) {

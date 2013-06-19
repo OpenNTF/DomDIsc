@@ -293,13 +293,14 @@ public class DatabaseManager {
 
 	}
 
+	/**
+	 * Deletes all entries in the log
+	 */
 	public void emptyAppLog() {
 
 		Dao appLogDao =  getHelper().getAppLogDao();
 		//			UpdateBuilder<AppLog, String> updateBuilder = appLogDao.updateBuilder();
 		DeleteBuilder<AppLog, String> deleteBuilder = appLogDao.deleteBuilder();
-
-
 
 		try {
 			deleteBuilder.where().isNotNull(AppLog.ID_FIELD_NAME);
@@ -308,8 +309,33 @@ public class DatabaseManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	
+	/**
+	 * Deletes first numberToDelete entries in the log
+	 *
+	 */
+	
+	//I am afraid that this is not good enough. It assumes that row IDs do not keep increasing 
+	public void removeFirstEntriesFromAppLog(int numberToDelete) {
 
+		Dao appLogDao =  getHelper().getAppLogDao();
+		DeleteBuilder<AppLog, String> deleteBuilder = appLogDao.deleteBuilder();
 
+		try {
+			long rowCount = appLogDao.countOf();
+			long deleteUpTo = rowCount - (rowCount-numberToDelete);
+			Log.i(getClass().getSimpleName(),  " number of log rows: " + rowCount);
+			Log.i(getClass().getSimpleName(),  " deleting rows lower than : " + deleteUpTo);
+			deleteBuilder.where().le(AppLog.ID_FIELD_NAME, deleteUpTo);
+			deleteBuilder.delete();
+			rowCount = appLogDao.countOf();
+			Log.i(getClass().getSimpleName(),  " number of log rows: " + rowCount);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 
