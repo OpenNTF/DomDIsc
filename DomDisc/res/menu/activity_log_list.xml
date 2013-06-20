@@ -9,9 +9,4 @@
         android:orderInCategory="100"
         android:showAsAction="ifRoom" 
         android:icon="@drawable/navigation_refresh"/>
-    <item android:id="@+id/menu_delete_100"
-        android:title="Delete 100"
-        android:orderInCategory="300"
-        android:showAsAction="ifRoom" 
-        />
         </menu>

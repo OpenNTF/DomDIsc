@@ -93,9 +93,11 @@ public class ScheduledService extends WakefulIntentService {
 			ApplicationLog.e(e.getMessage());
 		}
 		
-		ApplicationLogController appLogController = new ApplicationLogController(getApplicationContext());
-		appLogController.handleMessage(ApplicationLogController.MESSAGE_CLEANUP, null);
-
+//		ApplicationLogController appLogController = new ApplicationLogController(getApplicationContext());
+//		appLogController.handleMessage(ApplicationLogController.MESSAGE_CLEANUP, null);
+		int keepThisManyRows = 1000;
+		ApplicationLog.d(getClass().getSimpleName() + " Will purge all but the last " + keepThisManyRows + " log entries - in background thread", shouldLogALot);
+		DatabaseManager.getInstance().removeAllExceptNEntriesFromAppLog(keepThisManyRows); //Wrong method I am calling here.
 
 	}
 
