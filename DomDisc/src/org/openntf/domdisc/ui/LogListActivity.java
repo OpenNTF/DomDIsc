@@ -68,6 +68,11 @@ public class LogListActivity extends SherlockActivity {
 			//refresh
 			setupListView();
 			return true;
+		case R.id.menu_delete_100:
+			//Empty
+			DatabaseManager.getInstance().removeFirstEntriesFromAppLog(100);
+			setupListView();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

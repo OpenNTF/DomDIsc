@@ -313,8 +313,7 @@ public class DatabaseManager {
 	
 	
 	/**
-	 * Deletes first numberToDelete entries in the log
-	 *
+	 * Deletes oldest numberToDelete entries in the Application log. Slow - should be run in a non-UI thread
 	 */
 	
 	//I am afraid that this is not good enough. It assumes that row IDs do not keep increasing 
@@ -322,19 +321,27 @@ public class DatabaseManager {
 
 		Dao appLogDao =  getHelper().getAppLogDao();
 		DeleteBuilder<AppLog, String> deleteBuilder = appLogDao.deleteBuilder();
-
-		try {
-			long rowCount = appLogDao.countOf();
-			long deleteUpTo = rowCount - (rowCount-numberToDelete);
-			Log.i(getClass().getSimpleName(),  " number of log rows: " + rowCount);
-			Log.i(getClass().getSimpleName(),  " deleting rows lower than : " + deleteUpTo);
-			deleteBuilder.where().le(AppLog.ID_FIELD_NAME, deleteUpTo);
-			deleteBuilder.delete();
-			rowCount = appLogDao.countOf();
-			Log.i(getClass().getSimpleName(),  " number of log rows: " + rowCount);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		List<AppLog> allAppLogentries = getAllAppLogs();
+		if (allAppLogentries.size()>0) {
+			int numberOfLogEntries = allAppLogentries.size();
+			Log.d(getClass().getSimpleName(),  " number of log entries before deletion: " + numberOfLogEntries);
+			AppLog lastLogEntry = (AppLog) allAppLogentries.get(numberOfLogEntries-1);
+			int lastLogEntryId = lastLogEntry.getId();
+			Log.d(getClass().getSimpleName(),  " id of the last entry: " + lastLogEntryId);
+			
+			try {
+				long deleteUpToId = lastLogEntryId - numberOfLogEntries + numberToDelete;
+				Log.d(getClass().getSimpleName(),  " deleting rows lower than id#: " + deleteUpToId);
+				deleteBuilder.where().le(AppLog.ID_FIELD_NAME, deleteUpToId);
+				deleteBuilder.delete();
+				long numberOfLogEntriesPostDelete = appLogDao.countOf();
+				Log.d(getClass().getSimpleName(),  " number of log rows after deletion: " + numberOfLogEntriesPostDelete);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} else {
+			//No Log entries to work with
 		}
 	}
 

@@ -17,6 +17,8 @@ package org.openntf.domdisc.general;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.openntf.domdisc.controllers.ApplicationLogController;
+import org.openntf.domdisc.controllers.DiscussionDatabaseController;
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.model.DiscussionDatabase;
 import org.openntf.domdisc.tools.UserSessionTools;
@@ -90,6 +92,9 @@ public class ScheduledService extends WakefulIntentService {
 			ApplicationLog.e("Background replication stops due to Exception");
 			ApplicationLog.e(e.getMessage());
 		}
+		
+		ApplicationLogController appLogController = new ApplicationLogController(getApplicationContext());
+		appLogController.handleMessage(ApplicationLogController.MESSAGE_CLEANUP, null);
 
 
 	}
