@@ -6,7 +6,18 @@ The content is stored locally on the device, letting you read and participate in
 Replication happens in the background on a schedule configured by you.<br>
 You can configure the app to replicate with multiple discussion databases.<br>
 
-<h1>Getting the app to work</h1>
+<h1>Contents</h1>
+<a href="#Getting the app to work">Getting the app to work</a>
+<a href="#Log">Log</a>
+<a href="#Limitations">Limitations</a>
+<a href="#Security">Security</a>
+<a href="#Background information">Background information</a>
+<a href="#Thank you">Thank you</a>
+<a href="#Version history">Version history</a>
+<a href="#Other information">Other information</a>
+
+
+<a name="Getting the app to work"></a><h1>Getting the app to work</h1>
 
 <h2>Server and administration</h2>
 The Domino Data Service api is used to replicate with IBM Domino. This requires the IBM Domino server to be either release 9+ or it can be release 8.5.3+ with the Extension Library or Upgrade Pack. It also requires the server and discussion database to be configured to allow the use of the Domino Data Service api.<br>
@@ -46,24 +57,28 @@ Check to enable SSL. Encrypts data sent to and retrievede from the server. Highl
 <h4>HTTP Port</h4>
 This is the port used to communicate with the server. It is a number. Usually 80 (for non-ssl) or 443 (for ssl). If you check the use ssl option, you most likely should put 443 here. 
 
-<h1>Log</h1>
+<h4>Disable compute with form</h4>
+Most likely this option should be left unchecked. If you experience issues with new entries created in the app that do not show up in the database 
+on the Domino server, you could check this and it may help. 
+
+<a name="Log"></a><h1>Log</h1>
 There is a log available in the app from the action bar. How much is written to the log depends on your configuration.<br>
 Note that you can delete the log contents, using the delete action bar button.<br> 
 
-<h1>Limitations</h1>
+<a name="Limitations"></a><h1>Limitations</h1>
 <ul>
 <li>Only Domino Discussion Databases made with the standard template (StdR9Discussion) have been tested with the app. Other disucssion database designs may work.</li>
 <li>Images are not displayed.</li>
 </ul>
 
-<h1>Security</h1>
+<a name="Security"></a><h1>Security</h1>
 When you configure the app, please go for SSL (also known as HTTPS). Otherwise your username and password will get transmitted over the Internet in a form that is easy to get access to.<br>
 Be aware that your username and password do get stored in the app. If you lose the device, the password is not easily accessible, but someone with the right tools will be able to find and copy it.<br>
 Make sure that you use a Screen lock and a good device retrieval app that can help you wipe apps and data if you lose it.<br>
 You should <strong>consult with the server administrator</strong> in your organisation before using this app, to make sure that it meets IT-guidelines.   
 
 
-<h1>Background information</h1>
+<a name="Background information"></a><h1>Background information</h1>
 The app is developed using the Android SDK. It is a completely native app, using just Java.<br>
 
 <h2>Open source</h2>
@@ -81,7 +96,7 @@ You can find him blogging on <a href="http://www.jens.bruntt.dk">www.jens.bruntt
 </table>
 
 
-<h1>Thank you</h1>
+<a name="Thank you"></a><h1>Thank you</h1>
 <h2>The App launcher icon</h2>
 <table>
 <tr>
@@ -121,12 +136,9 @@ Code: Apache Commons Codec<br>
 URL: http://commons.apache.org/proper/commons-codec/<br>
 = = =
 
-<h1>Other information</h1>
-<a href="aboutapp.html">About the app</a> | <a href="serverconfiguration.html">Server configuration</a> | <a href="developer.html">Developer information</a>
+<a name="Version history"></a><h1>Version history</h1>
 
-<h1>Version history</h1>
-
-<h2>Version 1.3 beta 3</h2>
+<h2>Version 1.3</h2>
 This version upgrades the local database, and also discards all existing configuration. Sorry.
 <h3>New features</h3>
 <ul>
@@ -147,6 +159,9 @@ new documents from the app to the server, this may fix it.</li>
 <li>Two ways of sorting views available. Newest first or Hot treads.</li>
 </ul>
 
+
+<a name="Other information"></a><h1>Other information</h1>
+<a href="aboutapp.html">About the app</a> | <a href="serverconfiguration.html">Server configuration</a> | <a href="developer.html">Developer information</a>
 
  
 </body>

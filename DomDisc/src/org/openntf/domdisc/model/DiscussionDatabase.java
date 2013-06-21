@@ -1,6 +1,7 @@
 package org.openntf.domdisc.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -43,6 +44,10 @@ public class DiscussionDatabase {
 	
 	@DatabaseField
 	private boolean disableComputeWithForm;
+	
+	public static final String LASTSUCCESFULREPLICATIONDATE_FIELD_NAME = "noteid";  //accessible from outside to enable querying using the column name
+	@DatabaseField (columnName = LASTSUCCESFULREPLICATIONDATE_FIELD_NAME)
+	private Date lastSuccesfulReplicationDate;
 	
 
 
@@ -158,5 +163,15 @@ public class DiscussionDatabase {
 
 	public void setDisableComputeWithForm(boolean disableComputeWithForm) {
 		this.disableComputeWithForm = disableComputeWithForm;
+	}
+	
+
+
+	public Date getLastSuccesfulReplicationDate() {
+		return lastSuccesfulReplicationDate;
+	}
+
+	public void setLastSuccesfulReplicationDate(Date lastSuccesfulReplicationDate) {
+		this.lastSuccesfulReplicationDate = lastSuccesfulReplicationDate;
 	}
 }
