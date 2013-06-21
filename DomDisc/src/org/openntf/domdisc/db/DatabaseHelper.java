@@ -21,10 +21,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	private static final String DATABASE_NAME = "DiscDB.sqlite";
 
 	// any time you make changes to your database objects, increase database_version
-	private static final int DATABASE_VERSION = 16; 
+	private static final int DATABASE_VERSION = 17; 
 	// When increasing database_version, increase each of the version numbers below (to the value of database_version) 
 	// IF the model and thus table has been altered 
-	private static final int CURRENT_DATABASE_VERSION_DISCUSSIONDATABASE = 16; //OnUpgrade will check if oldVersion < this value and upgrade if yes 
+	private static final int CURRENT_DATABASE_VERSION_DISCUSSIONDATABASE = 17; //OnUpgrade will check if oldVersion < this value and upgrade if yes 
 	private static final int CURRENT_DATABASE_VERSION_DISCUSSIONENTRY = 16; //OnUpgrade will check if oldVersion < this value and upgrade if yes
 	private static final int CURRENT_DATABASE_VERSION_APPLOG = 16; //OnUpgrade will check if oldVersion < this value and upgrade if yes
 
