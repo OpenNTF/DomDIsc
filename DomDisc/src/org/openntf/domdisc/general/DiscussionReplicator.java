@@ -63,10 +63,11 @@ public class DiscussionReplicator {
 	/**
 	 * Activate to replicate one Discussion database
 	 */
-	public synchronized void replicateDiscussionDatabase(DiscussionDatabase discussionDatabase) {
+	public synchronized int replicateDiscussionDatabase(DiscussionDatabase discussionDatabase) {
 		String authenticationCookie = "";
 		DatabaseManager.init(context);
 		ApplicationLog.i("Replicate " + discussionDatabase.getName());
+		int additionCount = 0;
 
 		if (UserSessionTools.haveInternet(context) == false) {
 			ApplicationLog.i("Internet connection not available - Replication not possible");
@@ -107,17 +108,21 @@ public class DiscussionReplicator {
 			if (authenticationCookie.equals("")) {
 				ApplicationLog
 				.w("Unable to start replication as Authentication with the server was not established. Stopping.");
+				additionCount= -1;
 			} else {
 				replicateLocalDatabaseToServer(discussionDatabase, hostName,urlForDocuments, authenticationCookie, disableComputeWithForm);
 				// Any entries submitted will be deleted when the replicateServerToLocalDatabase runs (because the locally created entries' unids are not found in the downloaded entries)
-				if (replicateServerToLocalDatabase(discussionDatabase, hostName,urlForDocuments, authenticationCookie)) {
+				additionCount = replicateServerToLocalDatabase(discussionDatabase, hostName,urlForDocuments, authenticationCookie);
+				if ((additionCount) > -1) {
 					ApplicationLog.d(getClass().getSimpleName() + " Replication OK", shouldCommitToLog);
+					ApplicationLog.d(getClass().getSimpleName() + " Number of entries added: " + additionCount, shouldCommitToLog);
 					ApplicationLog.d(getClass().getSimpleName() + " - - - -", shouldCommitToLog);
 				} else {
 					ApplicationLog.w(getClass().getSimpleName() + " Replication server->database failed for " + discussionDatabase.getName());
 				}
 			}
 		}
+		return additionCount;
 	}
 
 	/**
@@ -262,13 +267,14 @@ public class DiscussionReplicator {
 	 * @param hostName
 	 * @param urlForDocuments
 	 * @param authenticationCookie
-	 * @return True if replication went as expected
+	 * @return Number of additions performed to local database. -1 if an error happened
 	 */
-	private boolean replicateServerToLocalDatabase(
+	private int replicateServerToLocalDatabase(
 			DiscussionDatabase discussionDatabase, String hostName,
 			String urlForDocuments, String authenticationCookie) {
-		// String url =
+		// example String url =
 		// "http://www.jens.bruntt.dk/androiddev/discussi.nsf/api/data/documents/";
+		int additionCount = 0;
 		boolean replicationOK = false;
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(
@@ -320,7 +326,7 @@ public class DiscussionReplicator {
 						 * We assume that if we download 0 entries, something is wrong with the downloaded content, and we do not dare let
 						 * the code do deletions locally
 						 */
-						handleJsonDiscussionEntries(jsonArray, discussionDatabase, authenticationCookie); 
+						additionCount = handleJsonDiscussionEntries(jsonArray, discussionDatabase, authenticationCookie); 
 					} else {
 						ApplicationLog.i("No entries retrieved. Will not do any local deletions");
 					}
@@ -374,7 +380,7 @@ public class DiscussionReplicator {
 			ApplicationLog.e(getClass().getSimpleName() + " " + message);
 			e2.printStackTrace();
 		}
-		return replicationOK;
+		return additionCount;
 	}
 
 	/**
@@ -402,11 +408,15 @@ public class DiscussionReplicator {
 	 * 
 	 * @param discussionArray
 	 * @param discussionDatabase
+	 * 
+	 * @return number of additions to the local database. -1 if an error condition was met
 	 */
-	private void handleJsonDiscussionEntries(JSONArray discussionArray, DiscussionDatabase discussionDatabase, String authenticationCookie) {
+	private int handleJsonDiscussionEntries(JSONArray discussionArray, DiscussionDatabase discussionDatabase, String authenticationCookie) {
 
 		//		ArrayList<DiscussionEntry> serverDiscussionEntryList = new ArrayList<DiscussionEntry>();
 		HashMap<String, DiscussionEntry> serverDiscussionEntryMap = new HashMap<String, DiscussionEntry>();
+		
+		int updatesCount = 0;
 
 		for (int i = 0; i < discussionArray.length(); i++) {
 			JSONObject jsonObject;
@@ -466,6 +476,7 @@ public class DiscussionReplicator {
 						DatabaseManager.getInstance().createDiscussionEntry(fullDiscussionEntry);
 						ApplicationLog.d("This entry has been stored with values: " + fullDiscussionEntry.getSubject(), shouldCommitToLog);
 						updateParentThreadDates(fullDiscussionEntry);
+						++updatesCount;
 					} else {
 						ApplicationLog.d("This entry has not been stored before, but the Form Type is not one of the accepted types. Will not store", shouldCommitToLog);
 					}
@@ -485,6 +496,7 @@ public class DiscussionReplicator {
 						dbEntry = fullDiscussionEntry;
 						DatabaseManager.getInstance().updateDiscussionEntry(dbEntry);
 						updateParentThreadDates(dbEntry);
+						++updatesCount;
 					}
 				}
 			}
@@ -524,7 +536,8 @@ public class DiscussionReplicator {
 		}
 		/**
 		 * Done checking if new or modified entries were downloaded
-		 */		
+		 */
+		return updatesCount;		
 
 	}
 

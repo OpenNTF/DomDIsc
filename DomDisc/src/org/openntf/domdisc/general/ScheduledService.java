@@ -17,17 +17,23 @@ package org.openntf.domdisc.general;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.openntf.domdisc.R;
 import org.openntf.domdisc.controllers.ApplicationLogController;
 import org.openntf.domdisc.controllers.DiscussionDatabaseController;
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.model.DiscussionDatabase;
 import org.openntf.domdisc.tools.UserSessionTools;
+import org.openntf.domdisc.ui.LogListActivity;
+import org.openntf.domdisc.ui.StartActivity;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
@@ -70,10 +76,17 @@ public class ScheduledService extends WakefulIntentService {
 
 					for (int i = 0, size = discussionDatabases.size(); i < size; i++)  
 					{  
+						int updateCounter = 0;
 						DiscussionDatabase discussionDatabase = discussionDatabases.get(i);
+						ApplicationLog.i("== == == == ==");
 						ApplicationLog.i("background Replicating " + discussionDatabase.getName());
 //						ApplicationLog.i(" path: " + discussionDatabase.getDbPath());
-						replicator.replicateDiscussionDatabase(discussionDatabase);
+						updateCounter = replicator.replicateDiscussionDatabase(discussionDatabase);
+						if (updateCounter > 0) {
+							notifyUser("Added " + updateCounter + " entries to " + discussionDatabase.getName(), "New entries");
+						} else if (updateCounter < 0) {
+							notifyUserError("Replication failed for " + discussionDatabase.getName(), "Failed replication");
+						}
 						ApplicationLog.i("== == == == ==");
 					}
 
@@ -172,6 +185,44 @@ public class ScheduledService extends WakefulIntentService {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(ctxt);
 		return prefs.getBoolean("checkbox_preference_logalot", false);
+	}
+	
+	private void notifyUser(String notificationText, String tickerText) {
+		Intent intent = new Intent(this, StartActivity.class);
+		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+		NotificationCompat.Builder notificationBuilder  = new NotificationCompat.Builder(this);
+		notificationBuilder.setContentTitle("Replication");
+		notificationBuilder.setContentText(notificationText);
+		notificationBuilder.setSmallIcon(R.drawable.domdisclaunchericon);
+		notificationBuilder.setTicker(tickerText);
+		notificationBuilder.setContentIntent(pIntent);
+		notificationBuilder.setOnlyAlertOnce(true);
+		notificationBuilder.setAutoCancel(true);
+		  
+		NotificationManager notificationManager = 
+		  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+		notificationManager.notify(0, notificationBuilder.build());
+	}
+	
+	private void notifyUserError(String notificationText, String tickerText) {
+		Intent intent = new Intent(this, LogListActivity.class);
+		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+		NotificationCompat.Builder notificationBuilder  = new NotificationCompat.Builder(this);
+		notificationBuilder.setContentTitle("Replication");
+		notificationBuilder.setContentText(notificationText);
+		notificationBuilder.setSmallIcon(R.drawable.domdisclaunchericon);
+		notificationBuilder.setTicker(tickerText);
+		notificationBuilder.setContentIntent(pIntent);
+		notificationBuilder.setOnlyAlertOnce(true);
+		notificationBuilder.setAutoCancel(true);
+		  
+		NotificationManager notificationManager = 
+		  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+		notificationManager.notify(0, notificationBuilder.build());
 	}
 
 }
