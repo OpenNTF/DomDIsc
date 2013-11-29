@@ -26,5 +26,17 @@
 		    android:entryValues="@array/entryvalues_logschedule_preference"
 		    android:dialogTitle="@string/dialog_title_logschedule_preference"/>
 	</PreferenceCategory>
+	
+		<PreferenceCategory android:title="@string/preference_category_notifications">
+		<CheckBoxPreference android:key="checkbox_preference_notifywhennew"
+			android:title="@string/title_checkbox_preference_notifywhennew"
+			android:summary="@string/summary_checkbox_preference_notifywhennew" />
+		<CheckBoxPreference android:key="checkbox_preference_notifywhenfail"
+			android:title="@string/title_checkbox_preference_notifywhenfail"
+			android:summary="@string/summary_checkbox_preference_notifywhenfail" />
+		<CheckBoxPreference android:key="checkbox_preference_notifytopebble"
+			android:title="@string/title_checkbox_preference_notifytopebble"
+			android:summary="@string/summary_checkbox_preference_notifytopebble" />
+	</PreferenceCategory>
 
 </PreferenceScreen>

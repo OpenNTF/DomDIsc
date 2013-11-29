@@ -8,6 +8,7 @@ import org.openntf.domdisc.general.ApplicationLog;
 import org.openntf.domdisc.general.Constants;
 import org.openntf.domdisc.general.PollReceiver;
 import org.openntf.domdisc.model.DiscussionDatabase;
+import org.openntf.domdisc.tools.DateUtil;
 
 import android.app.Activity;
 import android.content.Context;
@@ -124,9 +125,11 @@ public class DatabaseConfigurationsActivity extends SherlockActivity {
 
 		List<String> titles = new ArrayList<String>();
 		for (DiscussionDatabase db : discussionDatabases) {
-			titles.add(db.getName());
+			titles.add(db.getName()  + " [rep: " + DateUtil.getDateLong(db.getLastSuccesfulReplicationDate()) + "]");
 		}
 
+		
+		
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, titles);
 		lv.setAdapter(adapter);
 

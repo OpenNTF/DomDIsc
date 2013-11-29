@@ -131,4 +131,36 @@ public class UserSessionTools {
 		return prefs.getBoolean("checkbox_preference_logalot", false);
 	}
 
+	/**
+	 * 
+	 * @param ctxt
+	 * @return boolean true if we should create Notifications when new entries are added locally 
+	 */
+	public static boolean getNotifyWhenNew(Context ctxt) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
+		return prefs.getBoolean("checkbox_preference_notifywhennew", false);
+	}
+	
+	/**
+	 * 
+	 * @param ctxt
+	 * @return boolean true if we should create Notifications when replication has failed for a long period
+	 */
+	public static boolean getNotifyWhenFail(Context ctxt) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
+		return prefs.getBoolean("checkbox_preference_notifywhenfail", false);
+	}
+
+	
+	/**
+	 * 
+	 * @param ctxt
+	 * @return boolean true if we should also Push notifications to Pebble
+	 */
+	public static boolean getNotifyToPebble(Context ctxt) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
+		return prefs.getBoolean("checkbox_preference_notifytopebble", false);
+	}
+
+
 }

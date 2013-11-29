@@ -45,7 +45,7 @@ public class DiscussionDatabase {
 	@DatabaseField
 	private boolean disableComputeWithForm;
 	
-	public static final String LASTSUCCESFULREPLICATIONDATE_FIELD_NAME = "noteid";  //accessible from outside to enable querying using the column name
+	public static final String LASTSUCCESFULREPLICATIONDATE_FIELD_NAME = "lastsuccesrep";  //accessible from outside to enable querying using the column name
 	@DatabaseField (columnName = LASTSUCCESFULREPLICATIONDATE_FIELD_NAME)
 	private Date lastSuccesfulReplicationDate;
 	
@@ -168,7 +168,12 @@ public class DiscussionDatabase {
 
 
 	public Date getLastSuccesfulReplicationDate() {
-		return lastSuccesfulReplicationDate;
+		if (lastSuccesfulReplicationDate != null){
+			return lastSuccesfulReplicationDate;
+		} else {
+			return new Date(0); //1-1-1970 is default
+		}
+//		return lastSuccesfulReplicationDate;
 	}
 
 	public void setLastSuccesfulReplicationDate(Date lastSuccesfulReplicationDate) {

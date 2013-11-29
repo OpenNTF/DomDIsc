@@ -14,14 +14,20 @@
 
 package org.openntf.domdisc.general;
 
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.openntf.domdisc.R;
 import org.openntf.domdisc.controllers.ApplicationLogController;
 import org.openntf.domdisc.controllers.DiscussionDatabaseController;
 import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.model.DiscussionDatabase;
+import org.openntf.domdisc.tools.DateUtil;
 import org.openntf.domdisc.tools.UserSessionTools;
 import org.openntf.domdisc.ui.LogListActivity;
 import org.openntf.domdisc.ui.StartActivity;
@@ -38,6 +44,10 @@ import android.support.v4.app.NotificationCompat;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 
+/**
+ * @author jbr
+ *
+ */
 public class ScheduledService extends WakefulIntentService {
 	
 	boolean shouldLogALot = false;
@@ -80,19 +90,21 @@ public class ScheduledService extends WakefulIntentService {
 						DiscussionDatabase discussionDatabase = discussionDatabases.get(i);
 						ApplicationLog.i("== == == == ==");
 						ApplicationLog.i("background Replicating " + discussionDatabase.getName());
-//						ApplicationLog.i(" path: " + discussionDatabase.getDbPath());
 						updateCounter = replicator.replicateDiscussionDatabase(discussionDatabase);
 						if (updateCounter > 0) {
-							notifyUser("Added " + updateCounter + " entries to " + discussionDatabase.getName(), "New entries");
+							if (UserSessionTools.getNotifyWhenNew(applicationContext)){
+								notifyUser("Added " + updateCounter + " entries to " + discussionDatabase.getName(), "New entries", applicationContext);
+							}
+							
 						} else if (updateCounter < 0) {
-							notifyUserError("Replication failed for " + discussionDatabase.getName(), "Failed replication");
+							if (hasTimeSinceLastSuccesfulReplicationBeenTooLong(discussionDatabase.getLastSuccesfulReplicationDate(), applicationContext)) {
+								if (UserSessionTools.getNotifyWhenFail(applicationContext)){
+									notifyUserError("Failed for " + discussionDatabase.getName() + " - Last replication was on " + DateUtil.getDateLong(discussionDatabase.getLastSuccesfulReplicationDate()), "Failed replication", applicationContext);	
+								}
+							}
 						}
 						ApplicationLog.i("== == == == ==");
 					}
-
-
-					//					DiscussionDatabase discussionDatabase = discussionDatabases.get(0);
-
 
 
 				} else {
@@ -187,42 +199,128 @@ public class ScheduledService extends WakefulIntentService {
 		return prefs.getBoolean("checkbox_preference_logalot", false);
 	}
 	
-	private void notifyUser(String notificationText, String tickerText) {
+	/**
+	 * @param notificationText Permanently displayed text
+	 * @param tickerText Shows briefly when notifying
+	 * @param context 
+	 */
+	private void notifyUser(String notificationText, String tickerText, Context context) {
 		Intent intent = new Intent(this, StartActivity.class);
 		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
 		NotificationCompat.Builder notificationBuilder  = new NotificationCompat.Builder(this);
 		notificationBuilder.setContentTitle("Replication");
-		notificationBuilder.setContentText(notificationText);
-		notificationBuilder.setSmallIcon(R.drawable.domdisclaunchericon);
+		notificationBuilder.setContentText(notificationText);		
+		notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify);
+
 		notificationBuilder.setTicker(tickerText);
 		notificationBuilder.setContentIntent(pIntent);
-		notificationBuilder.setOnlyAlertOnce(true);
+//		notificationBuilder.setOnlyAlertOnce(true);
 		notificationBuilder.setAutoCancel(true);
 		  
 		NotificationManager notificationManager = 
 		  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
 		notificationManager.notify(0, notificationBuilder.build());
+		if (UserSessionTools.getNotifyToPebble(context)){
+			sendToPebble(notificationText);	
+		}
 	}
 	
-	private void notifyUserError(String notificationText, String tickerText) {
+	/**
+	 * @param notificationText Permanently displayed text
+	 * @param tickerText Shows briefly when notifying
+	 */
+	private void notifyUserError(String notificationText, String tickerText, Context context) {
 		Intent intent = new Intent(this, LogListActivity.class);
 		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
 		NotificationCompat.Builder notificationBuilder  = new NotificationCompat.Builder(this);
 		notificationBuilder.setContentTitle("Replication");
 		notificationBuilder.setContentText(notificationText);
-		notificationBuilder.setSmallIcon(R.drawable.domdisclaunchericon);
+		notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify);
 		notificationBuilder.setTicker(tickerText);
 		notificationBuilder.setContentIntent(pIntent);
-		notificationBuilder.setOnlyAlertOnce(true);
+//		notificationBuilder.setOnlyAlertOnce(true);
 		notificationBuilder.setAutoCancel(true);
 		  
 		NotificationManager notificationManager = 
 		  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
 		notificationManager.notify(0, notificationBuilder.build());
+		if (UserSessionTools.getNotifyToPebble(context)){
+			sendToPebble(notificationText);	
+		}
+		
+	}
+	
+	public void sendToPebble(String pebbleMessage) {
+	    final Intent i = new Intent("com.getpebble.action.SEND_NOTIFICATION");
+
+	    final Map<String, String> data = new HashMap<String, String>();
+	    data.put("title", "replication");
+	    data.put("body", pebbleMessage);
+	    final JSONObject jsonData = new JSONObject(data);
+	    final String notificationData = new JSONArray().put(jsonData).toString();
+
+	    i.putExtra("messageType", "PEBBLE_ALERT");
+	    i.putExtra("sender", "DomDisc");
+	    i.putExtra("notificationData", notificationData);
+
+//	    Log.d(TAG, "About to send a modal alert to Pebble: " %2B notificationData);
+	    
+	    ApplicationLog.i("Will send alert to Pebble: " + notificationData);
+	    sendBroadcast(i);
+	    
+	}
+	
+	/**
+	 * @param lastSuccesfulReplication
+	 * @param context
+	 * @return true if unacceptably long time has passed since the database was last replicated with success
+	 * the acceptable time is based on the configured replication interval. If the interval is frequent we accept a relatively long
+	 * wait. If the interval is infrequent we are less accepting.
+	 */
+	private boolean hasTimeSinceLastSuccesfulReplicationBeenTooLong(Date lastSuccesfulReplication, Context context) {
+		//Samples of acceptable wait times =(A3*3)-(A3/2)+5
+		// replication configured for X minutes | acceptable wait time minutes (approximate)
+		// 60	1hr		| 155	2.5hr 
+		// 240	4hr		| 605	10hr
+		// 1440	24hr	| 3605	60hr
+		Date nowDateTime = new Date();
+		long difference = nowDateTime.getTime()- lastSuccesfulReplication.getTime();
+		long diffMinutes = difference / (60 * 1000) % 60; // how long time has passed since replication happened
+		
+		int scheduledReplicationIntervalMinutes = getReplicationScheduleMinutes(context);
+		
+		int acceptableIntervalBetweenReplicationMinutes = (int) ((scheduledReplicationIntervalMinutes)*3) -(scheduledReplicationIntervalMinutes/2) + 5; 
+		ApplicationLog.d("acceptableIntervalBetweenReplication (mins): " +acceptableIntervalBetweenReplicationMinutes, shouldLogALot );
+		ApplicationLog.d("current time since succesful repl (mins): " + diffMinutes, shouldLogALot );
+		return (diffMinutes > acceptableIntervalBetweenReplicationMinutes);
+	}
+	
+	/**
+	 * 
+	 * @return int how many minutes should be between background replication
+	 *         events
+	 */
+	private static int getReplicationScheduleMinutes(Context ctxt) {
+		 
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(ctxt);
+
+		int replicationSchedulePreferenceMinutes = Integer.parseInt(prefs
+				.getString("list_preference_logschedule", "60"));
+
+		DatabaseManager.init(ctxt);
+
+		boolean shouldLogAlot = getLogALot(ctxt);
+
+		ApplicationLog.d("Read list_preference_logschedule: "
+				+ replicationSchedulePreferenceMinutes, shouldLogAlot);
+
+		return replicationSchedulePreferenceMinutes;
+
 	}
 
 }

@@ -2,6 +2,7 @@ package org.openntf.domdisc.general;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.openntf.domdisc.db.DatabaseManager;
 import org.openntf.domdisc.model.DiscussionDatabase;
 import org.openntf.domdisc.model.DiscussionEntry;
 import org.openntf.domdisc.model.DiscussionEntryForSubmitting;
+import org.openntf.domdisc.tools.DateUtil;
 import org.openntf.domdisc.tools.UserSessionTools;
 import org.springframework.http.ContentCodingType;
 import org.springframework.http.HttpEntity;
@@ -36,7 +38,9 @@ import org.springframework.web.client.RestTemplate;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 /**
  * Classe for replicating Domino Discussion databases
  */
@@ -44,20 +48,14 @@ public class DiscussionReplicator {
 
 	Context context;
 	private boolean shouldCommitToLog = false;
-	private static final String loginPath = "/names.nsf?Login";
-	private static final String loginRedirectTo = "/icons/ecblank.gif"; // Used when authenticating. On Succesful login, the Domino server will redirect (302) to this file 
+	private static final String loginPath = "/names.nsf?login";
+//	private static final String loginRedirectTo = "/icons/ecblank.gif"; // Used when authenticating. On Succesful login, the Domino server will redirect (302) to this file
+	private static final String loginRedirectTo = "/";
 
 	public DiscussionReplicator(Context context) {
 		super();
 		this.context = context;
 		shouldCommitToLog = getLogALot(context);
-	}
-
-	/**
-	 * Activate to replicate all known Discussion Databases
-	 */
-	public void replicateDiscussionDatabases() {
-
 	}
 
 	/**
@@ -72,34 +70,41 @@ public class DiscussionReplicator {
 		if (UserSessionTools.haveInternet(context) == false) {
 			ApplicationLog.i("Internet connection not available - Replication not possible");
 		} else {
-			ApplicationLog.d("Internet connection is available- Will replicate", shouldCommitToLog);
+			ApplicationLog.d("Internet connection is available - Will replicate", shouldCommitToLog);
 
 			String hostName = discussionDatabase.getHostName();
 			String dbPath = discussionDatabase.getDbPath();
 			String httpPort = discussionDatabase.getHttpPort();
 			String password = discussionDatabase.getPassword();
 			String userName = discussionDatabase.getUserName();
-			String httpType = "";
-			if (discussionDatabase.isUseSSL()) {
-				httpType = "https";
-			} else {
-				httpType = "http";
-			}
+			Date lastSuccesfulReplication = discussionDatabase.getLastSuccesfulReplicationDate();
+			
+//			String httpType = "";
+//			if (discussionDatabase.isUseSSL()) {
+//				httpType = "https";
+//			} else {
+//				httpType = "http";
+//			}
 			
 			boolean disableComputeWithForm = discussionDatabase.isDisableComputeWithForm();
 			
-			String urlForDocuments = httpType + "://" + hostName;
+			// https://dims.dk:443/database.nsf/api/data/documents
+			//String urlForDocuments = httpType + "://" + hostName;
+			String urlForDocuments = getUrlRootForHost(discussionDatabase) + dbPath + "/api/data/documents/"; 
 
-			if (httpPort.contentEquals("80") || httpPort.contentEquals("")) {
-				urlForDocuments = urlForDocuments + dbPath
-						+ "/api/data/documents/";
-			} else {
-				urlForDocuments = urlForDocuments + ":" + httpPort + dbPath
-						+ "/api/data/documents/";
-			}
+			
+//			if (httpPort.contentEquals("80") || httpPort.contentEquals("") || httpPort.contentEquals(" ")) {
+//				urlForDocuments = urlForDocuments + dbPath
+//						+ "/api/data/documents/";
+//			} else {
+//				urlForDocuments = urlForDocuments + ":" + httpPort + dbPath
+//						+ "/api/data/documents/";
+//			}
 
-			ApplicationLog.d("Starting", shouldCommitToLog);
-
+			
+			ApplicationLog.i("Starting replication for " + discussionDatabase.getName());
+			ApplicationLog.i("Last succesful replication for " + discussionDatabase.getName() + " was : " + DateUtil.getDateLong(lastSuccesfulReplication));
+			
 			// getAuthenticationToken
 			ApplicationLog.d("Activating getAuthenticationToken now", shouldCommitToLog);
 			authenticationCookie = getAuthenticationToken(hostName, httpPort,
@@ -117,6 +122,9 @@ public class DiscussionReplicator {
 					ApplicationLog.d(getClass().getSimpleName() + " Replication OK", shouldCommitToLog);
 					ApplicationLog.d(getClass().getSimpleName() + " Number of entries added: " + additionCount, shouldCommitToLog);
 					ApplicationLog.d(getClass().getSimpleName() + " - - - -", shouldCommitToLog);
+					Date nowDate = new Date();
+					discussionDatabase.setLastSuccesfulReplicationDate(nowDate);
+					DatabaseManager.getInstance().updateDiscussionDatabase(discussionDatabase); //persist the change
 				} else {
 					ApplicationLog.w(getClass().getSimpleName() + " Replication server->database failed for " + discussionDatabase.getName());
 				}
@@ -380,6 +388,9 @@ public class DiscussionReplicator {
 			ApplicationLog.e(getClass().getSimpleName() + " " + message);
 			e2.printStackTrace();
 		}
+		if (!replicationOK) {
+			additionCount = -1;
+		} 
 		return additionCount;
 	}
 
@@ -575,8 +586,8 @@ public class DiscussionReplicator {
 	 * Retrieve a full entry from the server
 	 * 
 	 * @param discussionEntry
-	 * @param discussionDatabase
-	 * @return discussionDatabase
+	 * @param AutheticationCookie
+	 * @return discussionEntry
 	 */
 	private DiscussionEntry getFullEntryFromServer(
 			DiscussionEntry discussionEntry, String authenticationCookie) {
@@ -589,6 +600,11 @@ public class DiscussionReplicator {
 				.getDiscussionDatabase();
 
 		String urlForDocuments = discussionEntry.getHref();
+		
+		//prefixing http and host etc to get a proper URL 
+		if (urlForDocuments.startsWith("/")){
+			urlForDocuments = getUrlRootForHost(discussionDatabase) + urlForDocuments;
+		}
 
 		ApplicationLog.d("Accesing " + urlForDocuments, shouldCommitToLog);
 
@@ -975,7 +991,32 @@ public class DiscussionReplicator {
 		} else {
 			ApplicationLog.d("Does not have a parent", shouldCommitToLog);
 		}
-	}
+	};
 
+	private String getUrlRootForHost(DiscussionDatabase discussionDatabase ){
+		String hostName = discussionDatabase.getHostName();
+		String httpPort = discussionDatabase.getHttpPort();
+		String httpType = "";
+		if (discussionDatabase.isUseSSL()) {
+			httpType = "https";
+		} else {
+			httpType = "http";
+		}
+		
+		// https://dims.dk:443/database.nsf/api/data/documents
+		String urlForHost = httpType + "://" + hostName;
+
+		if (httpPort.contentEquals("80") || httpPort.contentEquals("") || httpPort.contentEquals(" ")) {
+			//nothing to change
+		} else {
+			urlForHost = urlForHost + ":" + httpPort;
+		}
+		
+		
+		return urlForHost;
+		
+	}
+	
+	
 
 }

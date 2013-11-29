@@ -40,8 +40,16 @@
     <string name="summary_checkbox_preference_logalot">For debugging</string>
     <string name="preference_category_replication">Replication</string>
     <string name="title_list_preference_logschedule">Replication schedule</string>
-    <string name="summary_list_preference_logschedule">How often to sync</string>
+    <string name="summary_list_preference_logschedule">Change the synchronization schedule</string>
     <string name="dialog_title_logschedule_preference">Select schedule</string>
+    
+    <string name="preference_category_notifications">Notifications</string>
+    <string name="title_checkbox_preference_notifywhennew">Notify when new</string>
+    <string name="summary_checkbox_preference_notifywhennew">Alert if new documents have been added</string>
+    <string name="title_checkbox_preference_notifywhenfail">Notify when failing</string>
+    <string name="summary_checkbox_preference_notifywhenfail">Alert if replication has failed for a long time</string>
+    <string name="title_checkbox_preference_notifytopebble">Use pebble</string>
+    <string name="summary_checkbox_preference_notifytopebble">Push the above notifications to my Pebble smartwatch</string>
 
     <!-- AddDiscussionEntryActivity -->
     <string name="subject">Subject:</string>

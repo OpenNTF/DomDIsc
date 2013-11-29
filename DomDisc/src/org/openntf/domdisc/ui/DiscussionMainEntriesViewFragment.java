@@ -101,11 +101,16 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 			List<DiscussionEntry> tempDiscussionEntries = null;
 			
 			if(currentSearchQuery != "") {
+				ApplicationLog.d(getClass().getSimpleName() + " searching for entries by " + currentSearchQuery, shouldCommitToLog);
 				tempDiscussionEntries = DatabaseManager.getInstance().getMainDiscussionEntriesByQuery(currentDiscussionDatabase, currentSearchQuery);	
 			} else {
+				ApplicationLog.d(getClass().getSimpleName() + " getting All Main Entries", shouldCommitToLog);
 				tempDiscussionEntries = currentDiscussionDatabase.getMainEntries();
 			}
 			ApplicationLog.d(getClass().getSimpleName() + " tempDiscussionEntries.count: " + tempDiscussionEntries.size(), shouldCommitToLog);
+			if (tempDiscussionEntries.size() == 0) {
+				ApplicationLog.i(getClass().getSimpleName() + " no entries to display");
+			}
 			
 			final List<DiscussionEntry> discussionEntries = tempDiscussionEntries;
 			
