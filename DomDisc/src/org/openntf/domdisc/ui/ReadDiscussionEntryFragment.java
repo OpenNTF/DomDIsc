@@ -97,6 +97,7 @@ public final static int create_menu_id = 9874;
             	ApplicationLog.d(getClass().getSimpleName() + " got a unid: " + unid, shouldCommitToLog);
                 currentUnid = unid.toString();
                 currentDiscussionEntry = DatabaseManager.getInstance().getDiscussionEntryWithId(currentUnid);
+//                sad
             }
         }
         setHasOptionsMenu(true);
