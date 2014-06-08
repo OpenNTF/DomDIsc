@@ -15,9 +15,13 @@ package org.openntf.domdisc.ui;
  * limitations under the License.
  */
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 
 import org.openntf.domdisc.R;
 
@@ -48,5 +52,15 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 
         addPreferencesFromResource(R.xml.preferences);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+    
+    @Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case android.R.id.home:
+    		NavUtils.navigateUpTo(this, new Intent(this, org.openntf.domdisc.ui.DatabaseConfigurationsActivity.class));
+    		return true;
+    	}
+    	return super.onOptionsItemSelected(item);
     }
 }

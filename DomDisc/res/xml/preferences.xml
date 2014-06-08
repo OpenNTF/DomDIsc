@@ -33,7 +33,8 @@
 			android:summary="@string/summary_checkbox_preference_notifywhennew" />
 		<CheckBoxPreference android:key="checkbox_preference_notifywhenfail"
 			android:title="@string/title_checkbox_preference_notifywhenfail"
-			android:summary="@string/summary_checkbox_preference_notifywhenfail" />
+			android:summary="@string/summary_checkbox_preference_notifywhenfail" 
+			android:defaultValue="true"/>
 		<CheckBoxPreference android:key="checkbox_preference_notifytopebble"
 			android:title="@string/title_checkbox_preference_notifytopebble"
 			android:summary="@string/summary_checkbox_preference_notifytopebble" />
