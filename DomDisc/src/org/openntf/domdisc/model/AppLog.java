@@ -50,6 +50,10 @@ public class AppLog {
 	public void setLogTime(String logTime) {
 		this.logTime = logTime;
 	}
+	
+	public String toString() {
+		return logTime + " " + level + " " + message;
+	}
 
 	
 	

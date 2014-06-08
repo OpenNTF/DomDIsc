@@ -1,6 +1,8 @@
 package org.openntf.domdisc.ui;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.openntf.domdisc.db.DatabaseManager;
@@ -68,6 +70,24 @@ public class LogListActivity extends SherlockActivity {
 			//refresh
 			setupListView();
 			return true;
+		case R.id.menu_share:
+			Intent intent = new Intent(Intent.ACTION_SEND);
+		    intent.setType("text/plain");
+		      Date nowDate = new Date();
+		    intent.putExtra(Intent.EXTRA_SUBJECT, "Log from DomDisc on " + nowDate.toLocaleString() );
+		    
+		    List<AppLog> logEntries = DatabaseManager.getInstance().getAllAppLogs();
+		    
+		    String bodyText = new String("Log below: " + "\n");
+		    Iterator<AppLog> logIterator = logEntries.iterator();
+		    while (logIterator.hasNext()) {
+		    	AppLog thisLogLine = logIterator.next();
+		    	String thisLine = thisLogLine.toString();
+		    	bodyText = bodyText + thisLine + "\n";
+		    }
+		    intent.putExtra(Intent.EXTRA_TEXT, bodyText);  
+		    startActivity(Intent.createChooser(intent, "Share with"));
+		    // Done with share
 		}
 		return super.onOptionsItemSelected(item);
 	}

@@ -1,12 +1,22 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_empty_log"
-        android:title="@string/menu_empty_log"
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_empty_log"
+        android:icon="@drawable/content_discard"
         android:orderInCategory="200"
-        android:showAsAction="ifRoom" 
-        android:icon="@drawable/content_discard"/>
-    <item android:id="@+id/menu_refresh_log"
-        android:title="@string/menu_refresh"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_empty_log"/>
+    <item
+        android:id="@+id/menu_refresh_log"
+        android:icon="@drawable/navigation_refresh"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom" 
-        android:icon="@drawable/navigation_refresh"/>
-        </menu>
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_refresh"/>
+    <item
+        android:id="@+id/menu_share"
+        android:icon="@drawable/action_share"
+        android:orderInCategory="300"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_share"/>
+
+</menu>

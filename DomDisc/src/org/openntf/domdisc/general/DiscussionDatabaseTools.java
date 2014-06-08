@@ -37,15 +37,22 @@ public class DiscussionDatabaseTools {
 		
 		if (discussionDatabase.getHostName().length()>8) {
 			reportString = reportString + " hostName has the minimum length required, ";
+			if (discussionDatabase.getHostName().contains(" ")) {
+				ApplicationLog.w(" Host name contains a space character. This is probably a typing error ");
+			}
 		} else {
 			reportString = reportString + " hostName is too short - has it been filled in? ";
 			problemCount++;
 		};
 		
 		if (discussionDatabase.getDbPath().length()>4) {
-			reportString = reportString + " dbPath has the minimum length required, ";
+			reportString = reportString + " Path to database has the minimum length required, ";
+			
+			if (discussionDatabase.getDbPath().contains(" ")) {
+				ApplicationLog.w(" Path to database contains a space character. This is probably a typing error ");
+			}
 		} else {
-			reportString = reportString + " dbPath is too short - has it been filled in? ";
+			reportString = reportString + " Path to database is too short - has it been filled in? ";
 			problemCount++;
 		};
 		
@@ -68,17 +75,17 @@ public class DiscussionDatabaseTools {
 		
 		if (discussionDatabase.getHttpPort().equals("") || discussionDatabase.getHostName().toString().equals("80")) {
 			if (discussionDatabase.isUseSSL()) {
-				ApplicationLog.w(" Database is configured to use SSL, while the port is configured to be 80.");
-				ApplicationLog.w(" This is unlikely to be the combination you want. SSL usually is on port 443.");
-				reportString = reportString + " Database is configured to use SSL, while the port is configured to be 80 - possibly a configuration error.";
+				ApplicationLog.w(" Database is configured to use SSL, while the HTTP port is configured to be 80.");
+				ApplicationLog.w(" This is unlikely to be the combination you want. SSL usually is on HTTP port 443.");
+				reportString = reportString + " Database is configured to use SSL, while the HTTP port is configured to be 80 - possibly a configuration error.";
 			}
 		};
 		
 		if (discussionDatabase.getHttpPort().equals("443") ) {
 			if (!discussionDatabase.isUseSSL()) {
-				ApplicationLog.w(" Database is configured to use port 443, while SSL is not enabled.");
+				ApplicationLog.w(" Database is configured to use HTTP port 443, while SSL is not enabled.");
 				ApplicationLog.w(" This is unlikely to be the combination you want. ");
-				reportString = reportString + " Database is configured to use port 443, while ssl is disabled - possibly a configuration error.";
+				reportString = reportString + " Database is configured to use HTTP port 443, while ssl is disabled - possibly a configuration error.";
 			}
 		}
 		
