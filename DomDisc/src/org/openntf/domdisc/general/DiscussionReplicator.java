@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.QuotedPrintableCodec;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -822,29 +823,34 @@ public class DiscussionReplicator {
 						//contentTransferEncoding
 						String bodyHtmlDecoded = ""; 
 						if (bodyItem.has("contentTransferEncoding")) {
-							//							String contentTransferEncoding = bodyItem.getString("contentTransferEncoding");
+							String contentTransferEncoding = bodyItem.getString("contentTransferEncoding");
+							ApplicationLog.d("contentTransferEncoding is specified as " + contentTransferEncoding + " will do decoding", shouldCommitToLog);
 
-							//							ApplicationLog.d("contentTransferEncoding is specified as " + contentTransferEncoding + " will do decoding", shouldCommitToLog);
+							if (contentTransferEncoding.contains("quoted-printable")) {
+								QuotedPrintableCodec dims = new QuotedPrintableCodec(); 
 
-							QuotedPrintableCodec dims = new QuotedPrintableCodec(); 
+								// Stripping newline characters as they will make QuotedPrintableCodec throw an Exception
+								String newstr = bodyHtml.replaceAll("=\r\n", "");
 
-							// Stripping newline characters as they will make QuotedPrintableCodec throw an Exception
-							String newstr = bodyHtml.replaceAll("=\r\n", "");
+								bodyHtml = newstr;
+								//							ApplicationLog.d("decoding: " + bodyHtml, shouldCommitToLog);
 
-							bodyHtml = newstr;
-							//							ApplicationLog.d("decoding: " + bodyHtml, shouldCommitToLog);
-
-							try {
-								bodyHtmlDecoded = dims.decode(bodyHtml, charsetValue);
-							} catch (DecoderException e) {
-								//								e.printStackTrace();
-								ApplicationLog.d("Exception: " + e.getMessage(), shouldCommitToLog);
-							} catch (UnsupportedEncodingException e) {
-								//								e.printStackTrace();
-								ApplicationLog.d("Exception: " + e.getMessage(), shouldCommitToLog);
+								try {
+									bodyHtmlDecoded = dims.decode(bodyHtml, charsetValue);
+								} catch (DecoderException e) {
+									//								e.printStackTrace();
+									ApplicationLog.d("Exception: " + e.getMessage(), shouldCommitToLog);
+								} catch (UnsupportedEncodingException e) {
+									//								e.printStackTrace();
+									ApplicationLog.d("Exception: " + e.getMessage(), shouldCommitToLog);
+								}
+	
+							} else if(contentTransferEncoding.contains("base64")) {
+								byte[] byteArray = Base64.decodeBase64(bodyHtml.getBytes());
+								bodyHtmlDecoded = new String(byteArray);
+								
 							}
-
-							//							ApplicationLog.d("decoded: " + bodyHtmlDecoded, shouldCommitToLog);
+							
 						}
 
 						// Checking for quoted-printable content - END
