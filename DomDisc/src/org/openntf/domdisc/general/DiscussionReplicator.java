@@ -61,8 +61,18 @@ public class DiscussionReplicator {
 	/**
 	 * Activate to replicate one Discussion database
 	 */
+	/**
+	 * @param discussionDatabase to replicate
+	 * @return number of entries added to the database. -1 if an error occurred
+	 */
 	public synchronized int replicateDiscussionDatabase(DiscussionDatabase discussionDatabase) {
 		String authenticationCookie = "";
+		
+		if (discussionDatabase == null) {
+			ApplicationLog.w(getClass().getSimpleName() + " Replication server->database failed because the discussionDatabase object was null");
+			return -1;
+		}
+			
 		DatabaseManager.init(context);
 		ApplicationLog.i("Replicate " + discussionDatabase.getName());
 		int additionCount = 0;
@@ -79,6 +89,13 @@ public class DiscussionReplicator {
 			String userName = discussionDatabase.getUserName();
 			Date lastSuccesfulReplication = discussionDatabase.getLastSuccesfulReplicationDate();
 			
+			DiscussionDatabaseTools discussionDatabaseTools = new DiscussionDatabaseTools(context, discussionDatabase);
+			if (!discussionDatabaseTools.hasBasicReplicationRequiredFields()) {
+				ApplicationLog.w(getClass().getSimpleName() + " Replication server->database failed because the discussionDatabase configuration is not filled in. One or more fields needs proper content.");
+				return -1;
+			} ;
+			
+						
 //			String httpType = "";
 //			if (discussionDatabase.isUseSSL()) {
 //				httpType = "https";
@@ -121,13 +138,14 @@ public class DiscussionReplicator {
 				if ((additionCount) > -1) {
 					ApplicationLog.d(getClass().getSimpleName() + " Replication OK", shouldCommitToLog);
 					ApplicationLog.d(getClass().getSimpleName() + " Number of entries added: " + additionCount, shouldCommitToLog);
-					ApplicationLog.d(getClass().getSimpleName() + " - - - -", shouldCommitToLog);
+					
 					Date nowDate = new Date();
 					discussionDatabase.setLastSuccesfulReplicationDate(nowDate);
 					DatabaseManager.getInstance().updateDiscussionDatabase(discussionDatabase); //persist the change
 				} else {
 					ApplicationLog.w(getClass().getSimpleName() + " Replication server->database failed for " + discussionDatabase.getName());
 				}
+				ApplicationLog.i(getClass().getSimpleName() + " - - - -");
 			}
 		}
 		return additionCount;

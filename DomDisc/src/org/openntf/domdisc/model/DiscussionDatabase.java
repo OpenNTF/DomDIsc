@@ -48,8 +48,6 @@ public class DiscussionDatabase {
 	public static final String LASTSUCCESFULREPLICATIONDATE_FIELD_NAME = "lastsuccesrep";  //accessible from outside to enable querying using the column name
 	@DatabaseField (columnName = LASTSUCCESFULREPLICATIONDATE_FIELD_NAME)
 	private Date lastSuccesfulReplicationDate;
-	
-
 
 	public void setId(int id) {
 		this.id = id;
@@ -178,5 +176,6 @@ public class DiscussionDatabase {
 
 	public void setLastSuccesfulReplicationDate(Date lastSuccesfulReplicationDate) {
 		this.lastSuccesfulReplicationDate = lastSuccesfulReplicationDate;
-	}
+	};
+
 }

@@ -109,7 +109,7 @@ public class DiscussionMainEntriesViewFragment extends SherlockFragment {
 			}
 			ApplicationLog.d(getClass().getSimpleName() + " tempDiscussionEntries.count: " + tempDiscussionEntries.size(), shouldCommitToLog);
 			if (tempDiscussionEntries.size() == 0) {
-				ApplicationLog.i(getClass().getSimpleName() + " no entries to display");
+				ApplicationLog.d(getClass().getSimpleName() + " no entries to display", shouldCommitToLog);
 			}
 			
 			final List<DiscussionEntry> discussionEntries = tempDiscussionEntries;
