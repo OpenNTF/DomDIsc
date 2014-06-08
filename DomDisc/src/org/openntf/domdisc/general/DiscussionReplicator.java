@@ -282,6 +282,7 @@ public class DiscussionReplicator {
 			String urlForDocuments, String authenticationCookie) {
 		// example String url =
 		// "http://www.jens.bruntt.dk/androiddev/discussi.nsf/api/data/documents/";
+		urlForDocuments = urlForDocuments + "?compact=true";
 		int additionCount = 0;
 		boolean replicationOK = false;
 		RestTemplate restTemplate = new RestTemplate();
@@ -319,6 +320,9 @@ public class DiscussionReplicator {
 			ApplicationLog.d(
 					"String received length: " + jsonString.length(),
 					shouldCommitToLog);
+			
+			ApplicationLog.d(
+					"Content encoding: " + response.getHeaders().getContentEncoding().toString(), shouldCommitToLog);
 
 			if (!isThisALoginForm(jsonString)) {
 				try {
@@ -605,6 +609,7 @@ public class DiscussionReplicator {
 		if (urlForDocuments.startsWith("/")){
 			urlForDocuments = getUrlRootForHost(discussionDatabase) + urlForDocuments;
 		}
+		urlForDocuments = urlForDocuments + "?compact=true";
 
 		ApplicationLog.d("Accesing " + urlForDocuments, shouldCommitToLog);
 
